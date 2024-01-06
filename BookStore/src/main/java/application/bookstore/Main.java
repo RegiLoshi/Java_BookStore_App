@@ -1,5 +1,6 @@
 package application.bookstore;
 
+import application.bookstore.views.AdminView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
