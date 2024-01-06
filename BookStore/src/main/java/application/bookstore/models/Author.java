@@ -1,0 +1,37 @@
+package application.bookstore.models;
+
+import java.util.ArrayList;
+
+public class Author {
+
+    private String fullName;
+    private ArrayList<Book> authorBooks;
+
+
+    public Author(String fullName) {
+        authorBooks=new ArrayList<>();
+        this.fullName = fullName;
+    }
+
+    public void addBook(Book book)
+    {
+        authorBooks.add(book);
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public int getNumberOfBooks() {
+        return authorBooks.size();
+    }
+
+    public ArrayList<Book> getAuthorBooks()
+    {
+        return this.authorBooks;
+    }
+}
