@@ -5,33 +5,32 @@ import java.util.Date;
 
 public class Book {
 
-    private String ISBN,category,bookName,author,bookCategory,
-          bookSupplier,bookDescription,bookURL;
+    private String ISBN,name,author,category,
+        description,bookURL;
 
     private Date purchaseDate;
 
     private double purchasedPrice, originalPrice,sellingPrice;
-    private int bookQuantity;
+    private int quantity;
 
-    public Book(){}//to be called by SoldProduct
+    private Supplier supplier;
 
-  public Book(String ISBN, String category, String bookName, String author,
-              String bookCategory, String bookSupplier, String bookDescription,
+  public Book(String ISBN, String name, String author,
+              String category, Supplier supplier, String description,
               String bookURL, Date purchaseDate, double purchasedPrice,
-              double originalPrice, double sellingPrice, int bookQuantity) {
+              double originalPrice, double sellingPrice, int quantity) {
     this.ISBN = ISBN;
-    this.category = category;
-    this.bookName = bookName;
+    this.name = name;
     this.author = author;
-    this.bookCategory = bookCategory;
-    this.bookSupplier = bookSupplier;
-    this.bookDescription = bookDescription;
+    this.category = category;
+    this.supplier = supplier;
+    this.description = description;
     this.bookURL = bookURL;
     this.purchaseDate = purchaseDate;
     this.purchasedPrice = purchasedPrice;
     this.originalPrice = originalPrice;
     this.sellingPrice = sellingPrice;
-    this.bookQuantity = bookQuantity;
+    this.quantity = quantity;
   }
 
   public String getISBN() {
@@ -42,20 +41,12 @@ public class Book {
     this.ISBN = ISBN;
   }
 
-  public String getCategory() {
-    return category;
+  public String getname() {
+    return name;
   }
 
-  public void setCategory(String category) {
-    this.category = category;
-  }
-
-  public String getbookName() {
-    return bookName;
-  }
-
-  public void setbookName(String bookName) {
-    this.bookName = bookName;
+  public void setname(String name) {
+    this.name = name;
   }
 
   public String getAuthor() {
@@ -66,28 +57,28 @@ public class Book {
     this.author = author;
   }
 
-  public String getbookCategory() {
-    return bookCategory;
+  public String getcategory() {
+    return category;
   }
 
-  public void setbookCategory(String bookCategory) {
-    this.bookCategory = bookCategory;
+  public void setcategory(String category) {
+    this.category = category;
   }
 
-  public String getbookSupplier() {
-    return bookSupplier;
+  public Supplier getsupplier() {
+    return supplier;
   }
 
-  public void setbookSupplier(String bookSupplier) {
-    this.bookSupplier = bookSupplier;
+  public void setsupplier(Supplier supplier) {
+    this.supplier = supplier;
   }
 
-  public String getbookDescription() {
-    return bookDescription;
+  public String getdescription() {
+    return description;
   }
 
-  public void setbookDescription(String bookDescription) {
-    this.bookDescription = bookDescription;
+  public void setdescription(String description) {
+    this.description = description;
   }
 
   public String getbookURL() {
@@ -130,12 +121,17 @@ public class Book {
     this.sellingPrice = sellingPrice;
   }
 
-  public int getbookQuantity() {
-    return bookQuantity;
+  public int getquantity() {
+    return quantity;
   }
 
-  public void setbookQuantity(int bookQuantity) {
-    this.bookQuantity = bookQuantity;
+  public void setquantity(int quantity) {
+    this.quantity = quantity;
+  }
+
+  public void decrementQuantity(int x)
+  {
+    this.quantity-=x;
   }
 
   @Override
@@ -143,17 +139,17 @@ public class Book {
     return "Book{" +
             "ISBN='" + ISBN + '\'' +
             ", category='" + category + '\'' +
-            ", bookName='" + bookName + '\'' +
+            ", name='" + name + '\'' +
             ", author='" + author + '\'' +
-            ", bookCategory='" + bookCategory + '\'' +
-            ", bookSupplier='" + bookSupplier + '\'' +
-            ", bookDescription='" + bookDescription + '\'' +
+            ", category='" + category + '\'' +
+            ", supplier='" + supplier + '\'' +
+            ", description='" + description + '\'' +
             ", bookURL='" + bookURL + '\'' +
             ", purchaseDate=" + purchaseDate +
             ", purchasedPrice=" + purchasedPrice +
             ", originalPrice=" + originalPrice +
             ", sellingPrice=" + sellingPrice +
-            ", bookQuantity=" + bookQuantity +
+            ", quantity=" + quantity +
             '}';
   }
 }

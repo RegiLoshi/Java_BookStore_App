@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Bill {
-    private ArrayList<SoldBook> booksSold;
+
+    private int orderId;
+    private ArrayList<SoldBookType> booksSold;
     private double amount = 0;
     protected Date dateIssued;
 
-    public Bill(ArrayList<SoldBook> booksSold,Date date) {
+    public Bill(ArrayList<SoldBookType> booksSold,Date date) {
+        this.orderId++;
         this.booksSold = booksSold;
-        for(SoldBook soldBook:booksSold)
-            amount += soldBook.getsellingPrice() * soldBook.getSoldQuantity();
+        for(SoldBookType books:booksSold)
+            amount += books.getSoldBook().getsellingPrice() * books.getSoldQuantity();
         this.dateIssued=date;
     }
 
@@ -19,11 +22,16 @@ public class Bill {
         return amount;
     }
 
-    public ArrayList<SoldBook> getBooksSold() {
+    public ArrayList<SoldBookType> getBooksSold() {
         return booksSold;
     }
 
     public Date getDateIssued() {
         return dateIssued;
     }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
 }

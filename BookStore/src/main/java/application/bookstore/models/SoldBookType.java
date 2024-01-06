@@ -2,26 +2,24 @@ package application.bookstore.models;
 
 import java.util.Date;
 
-public class SoldBook extends Book{
-    private int orderId;
+//The SoldBooks class will hold a book type with the quantity being sold
+//Example "Harry Potter Book" soldQuantity=5
+//Now this book type will be written in the bill along with the sold quantity
+public class SoldBookType{
+    public int soldBooksID;
     private int  soldQuantity;
     private Date dateOfTransaction;
     private Book soldBook;
 
-    public SoldBook(int soldQuantity,Date date,Book soldBook)
+    public SoldBookType(int soldQuantity,Date date,Book soldBook)
     {
-        this.orderId++;
+        this.soldBooksID++;
         this.soldQuantity=soldQuantity;
         this.dateOfTransaction=date;
         this.soldBook=soldBook;
-    }
 
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
+        //Decrementing the book type quantity in the bookstore
+        soldBook.decrementQuantity(soldQuantity);
     }
 
     public int getSoldQuantity() {
@@ -46,5 +44,10 @@ public class SoldBook extends Book{
 
     public void setSoldBook(Book soldBook) {
         this.soldBook = soldBook;
+    }
+
+    public int getSoldBookID()
+    {
+        return this.soldBooksID;
     }
 }
