@@ -8,10 +8,11 @@ public class Bill {
     private double amount = 0;
     protected Date dateIssued;
 
-    public Bill(ArrayList<SoldBook> booksSold) {
+    public Bill(ArrayList<SoldBook> booksSold,Date date) {
         this.booksSold = booksSold;
         for(SoldBook soldBook:booksSold)
             amount += soldBook.getsellingPrice() * soldBook.getSoldQuantity();
+        this.dateIssued=date;
     }
 
     public double getTotalAmount() {
