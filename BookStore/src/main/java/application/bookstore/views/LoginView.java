@@ -7,7 +7,6 @@ import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.models.Role;
 import application.bookstore.models.User;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -24,6 +23,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.sql.*;
+
 
 public class LoginView implements DatabaseConnector {
     User user;
@@ -87,7 +87,7 @@ public class LoginView implements DatabaseConnector {
             try {
                 Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM user");
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM user where Role='admin'");
 
                 if (resultSet.next()) {
                     String username = resultSet.getString("username");
@@ -106,7 +106,7 @@ public class LoginView implements DatabaseConnector {
                                         Role.ADMIN
                                 );
                                 infoBox("Login Successful!", null, "Success");
-                                AdminView adminView = new AdminView(user);
+                                application.bookstore.views.AdminView adminView = new application.bookstore.views.AdminView(user);
                                 try {
                                     stage.setScene(adminView.showView(stage));
                                 } catch (Exception exception) {
@@ -148,7 +148,7 @@ public class LoginView implements DatabaseConnector {
                 ex.printStackTrace();
             }
         });
-    
+
         stage.setTitle("Log in");
         return new Scene(grid, 1000, 700);
     }
