@@ -11,4 +11,5 @@ module application.bookstore {
     opens application.bookstore to java.base;
     exports application.bookstore;
     exports application.bookstore.views;
+    exports application.bookstore.models;
 }

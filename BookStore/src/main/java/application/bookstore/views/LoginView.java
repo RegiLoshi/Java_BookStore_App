@@ -4,6 +4,10 @@ package application.bookstore.views;
 //Than the admin can change the username and password if they wish to
 
 import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.models.Role;
+import application.bookstore.models.User;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -22,7 +26,7 @@ import javafx.stage.Stage;
 import java.sql.*;
 
 public class LoginView implements DatabaseConnector {
-
+    User user;
     public Scene showView(Stage stage)
     {
         stage.setTitle("JavaFX Login Example");
@@ -44,9 +48,9 @@ public class LoginView implements DatabaseConnector {
         TextField userTextField = new TextField();
         grid.add(userTextField, 1, 4);
 
-        Label password = new Label("Password:");
-        password.setFont(Font.font(20));
-        grid.add(password, 0, 5);
+        Label password_label = new Label("Password:");
+        password_label.setFont(Font.font(20));
+        grid.add(password_label, 0, 5);
 
         PasswordField passwordField = new PasswordField();
         grid.add(passwordField, 1, 5);
@@ -58,7 +62,7 @@ public class LoginView implements DatabaseConnector {
         grid.add(hbtn, 0, 7,2,1);
 
         btn.setOnAction(e -> {
-            String username = userTextField.getText().toString();
+            String username1 = userTextField.getText().toString();
             String password1 = passwordField.getText().toString();
 
             if (userTextField.getText().isEmpty()) {
@@ -83,21 +87,56 @@ public class LoginView implements DatabaseConnector {
             try {
                 Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT username,password FROM user");
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM user");
 
                 if (resultSet.next()) {
-                    String adminUsername = resultSet.getString("username");
-                    String adminPassword = resultSet.getString("password");
-                    if (adminUsername.equals(username) && adminPassword.equals(password1)) {
-                        infoBox("Login Successful!", null, "Success");
-                        AdminView adminView = new AdminView();
-                        try {
-                            stage.setScene(adminView.showView(stage));
-                        } catch (Exception exception) {
-                            System.out.println("Error in adminView");
-                            exception.printStackTrace();
+                    String username = resultSet.getString("username");
+                    String password = resultSet.getString("password");
+                    if (username1.equals(username) && password1.equals(password)) {
+                        String role = resultSet.getString("Role");
+                        switch (role) {
+                            case "admin":
+                                user = new User(
+                                        new SimpleStringProperty(resultSet.getString("firstName")),
+                                        new SimpleStringProperty(resultSet.getString("lastName")),
+                                        new SimpleStringProperty(resultSet.getString("email")),
+                                        new SimpleStringProperty(username),
+                                        new SimpleStringProperty(password),
+                                        new SimpleStringProperty(resultSet.getString("gender")),
+                                        Role.ADMIN
+                                );
+                                infoBox("Login Successful!", null, "Success");
+                                AdminView adminView = new AdminView(user);
+                                try {
+                                    stage.setScene(adminView.showView(stage));
+                                } catch (Exception exception) {
+                                    System.out.println("Error in adminView");
+                                    exception.printStackTrace();
+                                }
+                                break;
+                            case "librarian":
+                                user = new User(
+                                        new SimpleStringProperty(resultSet.getString("firstName")),
+                                        new SimpleStringProperty(resultSet.getString("lastName")),
+                                        new SimpleStringProperty(resultSet.getString("email")),
+                                        new SimpleStringProperty(username),
+                                        new SimpleStringProperty(password),
+                                        new SimpleStringProperty(resultSet.getString("gender")),
+                                        Role.LIBRARIAN
+                                );
+                                break;
+                            case "manager":
+                                user = new User(
+                                        new SimpleStringProperty(resultSet.getString("firstName")),
+                                        new SimpleStringProperty(resultSet.getString("lastName")),
+                                        new SimpleStringProperty(resultSet.getString("email")),
+                                        new SimpleStringProperty(username),
+                                        new SimpleStringProperty(password),
+                                        new SimpleStringProperty(resultSet.getString("gender")),
+                                        Role.MANAGER
+                                );
+                                break;
                         }
-
                     } else {
                         infoBox("Please enter correct Email and Password", null, "Failed");
                     }
