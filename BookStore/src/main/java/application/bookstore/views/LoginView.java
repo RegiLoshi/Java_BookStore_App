@@ -93,7 +93,7 @@ public class LoginView implements DatabaseConnector {
                     String username = resultSet.getString("username");
                     String password = resultSet.getString("password");
                     if (username1.equals(username) && password1.equals(password)) {
-                        String role = resultSet.getString("Role");
+                        String role = resultSet.getString("Role").toLowerCase();
                         switch (role) {
                             case "admin":
                                 user = new User(

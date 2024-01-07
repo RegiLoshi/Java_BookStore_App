@@ -63,6 +63,13 @@ public class AdminView {
 		profile_button.setPrefHeight(120);
 		profile_button.setPrefWidth(150);
 		profile_button.setBackground(null);
+		profile_button.setOnAction(e -> {
+					ProfileView profileView = new ProfileView(user);
+					Stage pop_up = new Stage();
+					pop_up.setScene(profileView.showView(pop_up));
+					pop_up.show();
+					}
+				);
 		
 		other_users_buttons = new Button("",buttonImages[1]);
 		other_users_buttons.setPrefHeight(120);
@@ -88,7 +95,8 @@ public class AdminView {
 		options.setAlignment(Pos.CENTER);
 
 		//event handlers for the buttons
-		other_users_buttons.setOnAction(e->{
+		other_users_buttons.setOnAction(e ->
+		{
 			OtherUsersView otherUsersView=new OtherUsersView();
 			stage.setScene(otherUsersView.showView(stage));
 		});
@@ -107,8 +115,6 @@ public class AdminView {
 		
 		frame.setLeft(options);
 		frame.setCenter(center);
-		
-		// create scene
 
 		stage.setTitle("Admin Window");
 		return new Scene(frame , 1000 , 700 );
@@ -161,8 +167,6 @@ public class AdminView {
 							break;
 					}
 				}catch(java.io.FileNotFoundException e) {
-					//Alert notifying user if there is an error regarding loading picture
-					//!!!!!!! Alert shows under the stage, needs to be fixed!
 					alert = new Alert(AlertType.ERROR);
 					alert.setContentText("Resources Missing!Contact your Admin!\nErrorCode:104");
 					alert.show();
