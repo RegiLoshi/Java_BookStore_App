@@ -14,7 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class AdminView extends Application {
+public class AdminView {
 	private ImageView[] buttonImages = new ImageView[5];
 	private BorderPane frame;
 	private VBox options;
@@ -29,8 +29,8 @@ public class AdminView extends Application {
 	private Alert alert;
 	private VBox center;
 	private Label welcome_user;
-	@Override
-	public void start(Stage stage) throws Exception {
+
+	public Scene showView(Stage stage) throws Exception {
 		
 		frame = new BorderPane(); // Main Frame that will hold every component and pane
 		frame.setStyle("-fx-background-color: #FFF9E9;");
@@ -81,10 +81,15 @@ public class AdminView extends Application {
 		
 		options.getChildren().addAll(profile_button, other_users_buttons , bookstore_button , perfomance_button , log_out_button);
 		options.setAlignment(Pos.CENTER);
+
+		//event handlers for the buttons
+		other_users_buttons.setOnAction(e->{
+			OtherUsersView otherUsersView=new OtherUsersView();
+			stage.setScene(otherUsersView.showView(stage));
+		});
 	
 		center = new VBox();
-		
-		
+
 		welcome_user = new Label("Welcome Admin"); 												//!!!!!!!!!!!! Replace with the class.getUsername(); to make it Dynamic depending on which users logs in
 		welcome_user.setStyle(
 		        "-fx-font-size: 40px;" + // Set font size to 24 pixels							//!!!!!!! Not Finished yet the style will be changed to match background and look better
@@ -99,10 +104,9 @@ public class AdminView extends Application {
 		frame.setCenter(center);
 		
 		// create scene
-		scene = new Scene(frame , 2000 , 2000 );
-		stage.setScene(scene);
+
 		stage.setTitle("Admin Window");
-		stage.show();
+		return new Scene(frame , 1000 , 700 );
 	}
 	
 	private void getButtonImages() {
@@ -114,35 +118,35 @@ public class AdminView extends Application {
 			try {
 				switch(i) {
 					case 0:
-						image = new FileInputStream("Images/profile_icon.png");
+						image = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\src\\main\\java\\application\\bookstore\\Images\\profile_icon.png");
 						img = new Image(image);
 						buttonImages[0] = new ImageView(img);
 						buttonImages[0].setFitHeight(100);
 						buttonImages[0].setFitWidth(100);
 						break;
 					case 1:
-						image = new FileInputStream("Images/other_users.png");
+						image = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\src\\main\\java\\application\\bookstore\\Images\\other_users.png");
 						img = new Image(image);
 						buttonImages[1] = new ImageView(img);
 						buttonImages[1].setFitHeight(100);
 						buttonImages[1].setFitWidth(100);
 						break;
 					case 2:
-						image = new FileInputStream("bookstore/Images/book.png");
+						image = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\src\\main\\java\\application\\bookstore\\Images\\book.png");
 						img = new Image(image);
 						buttonImages[2] = new ImageView(img);
 						buttonImages[2].setFitHeight(120);
 						buttonImages[2].setFitWidth(120);
 						break;
 					case 3:
-						image = new FileInputStream("Images/statistics.png");
+						image = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\src\\main\\java\\application\\bookstore\\Images\\statistics.png");
 						img = new Image(image);
 						buttonImages[3] = new ImageView(img);
 						buttonImages[3].setFitHeight(140);
 						buttonImages[3].setFitWidth(140);
 						break;
 					case 4:
-						image = new FileInputStream("Images/log_out.png");
+						image = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\src\\main\\java\\application\\bookstore\\Images\\log_out.png");
 						img = new Image(image);
 						buttonImages[4] = new ImageView(img);
 						buttonImages[4].setFitHeight(100);
@@ -159,7 +163,5 @@ public class AdminView extends Application {
 			}
 	}
 	} 
-	public static void main(String[] args) {
-		Application.launch(args);
-	} 
+
 }

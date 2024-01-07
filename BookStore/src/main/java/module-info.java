@@ -6,6 +6,7 @@ module application.bookstore {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
 
     opens application.bookstore to java.base;
     exports application.bookstore;

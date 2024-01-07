@@ -1,19 +1,23 @@
 package application.bookstore;
 
-import application.bookstore.views.AdminView;
+import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.views.LoginView;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+import java.sql.*;
 
-    public void start(Stage primaryStage)
-    {
+public class Main extends Application implements DatabaseConnector {
+
+    public void start(Stage stage)  {
+        LoginView lg=new LoginView();
+        stage.setTitle("Bookstore");
+        stage.setScene(lg.showView(stage));
+        stage.show();
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         launch();
     }
+
 }
