@@ -1,11 +1,14 @@
 package application.bookstore.models;
 
 
+import javafx.scene.image.ImageView;
+
 import java.util.Date;
 
-public class Book {
+public class Book  {
 
-    private String ISBN,name,author,category,
+  private int supplierid;
+  private String ISBN,title,author,category,
         description,bookURL;
 
     private Date purchaseDate;
@@ -15,12 +18,29 @@ public class Book {
 
     private Supplier supplier;
 
+    //Constructor made for Book object which will be added to table , so purchased date and purchased price are not needed
+  public Book(String ISBN, String name, String author,
+              String category, int supplierid, String description,
+              String bookURL, double originalPrice, double sellingPrice, int quantity) {
+    this.ISBN = ISBN;
+    this.title = name;
+    this.author = author;
+    this.category = category;
+    supplier = Supplier.getSupplierDB(supplierid);
+    this.description = description;
+    ImageView image = new ImageView(bookURL);
+    this.originalPrice = originalPrice;
+    this.sellingPrice = sellingPrice;
+    this.quantity = quantity;
+  }
+
+  //Constructor made for Book object which will be bought
   public Book(String ISBN, String name, String author,
               String category, Supplier supplier, String description,
               String bookURL, Date purchaseDate, double purchasedPrice,
               double originalPrice, double sellingPrice, int quantity) {
     this.ISBN = ISBN;
-    this.name = name;
+    this.title = name;
     this.author = author;
     this.category = category;
     this.supplier = supplier;
@@ -41,12 +61,12 @@ public class Book {
     this.ISBN = ISBN;
   }
 
-  public String getname() {
-    return name;
+  public String gettitle() {
+    return title;
   }
 
-  public void setname(String name) {
-    this.name = name;
+  public void settitle(String name) {
+    this.title = name;
   }
 
   public String getAuthor() {
@@ -81,8 +101,8 @@ public class Book {
     this.description = description;
   }
 
-  public String getbookURL() {
-    return bookURL;
+  public ImageView getbookURL() {
+    return new ImageView(bookURL);
   }
 
   public void setbookURL(String bookURL) {
@@ -139,7 +159,7 @@ public class Book {
     return "Book{" +
             "ISBN='" + ISBN + '\'' +
             ", category='" + category + '\'' +
-            ", name='" + name + '\'' +
+            ", name='" + title + '\'' +
             ", author='" + author + '\'' +
             ", category='" + category + '\'' +
             ", supplier='" + supplier + '\'' +

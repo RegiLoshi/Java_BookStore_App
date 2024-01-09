@@ -29,7 +29,7 @@ public class LoginView implements DatabaseConnector {
     User user;
     public Scene showView(Stage stage)
     {
-        stage.setTitle("JavaFX Login Example");
+        stage.setTitle("JavaFX Login");
         GridPane grid=new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(15);

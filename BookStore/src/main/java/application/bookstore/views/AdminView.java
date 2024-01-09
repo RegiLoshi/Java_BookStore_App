@@ -79,6 +79,10 @@ public class AdminView {
 		bookstore_button.setPrefHeight(120);
 		bookstore_button.setPrefWidth(150);
 		bookstore_button.setBackground(null);
+		bookstore_button.setOnAction( e -> {
+			BookView bookview = new BookView(user.getRole());
+			stage.setScene(bookview.showView(stage));
+		});
 
 		perfomance_button = new Button("",buttonImages[3]);
 		perfomance_button.setPrefHeight(120);
