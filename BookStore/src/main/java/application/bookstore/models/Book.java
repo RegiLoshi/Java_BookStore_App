@@ -1,6 +1,8 @@
 package application.bookstore.models;
 
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.util.Date;
@@ -9,7 +11,9 @@ public class Book  {
 
   private int supplierid;
   private String ISBN,title,author,category,
-        description,bookURL;
+        description;
+
+  private SimpleObjectProperty<ImageView> bookImageProperty = new SimpleObjectProperty<>();
 
     private Date purchaseDate;
 
@@ -21,14 +25,14 @@ public class Book  {
     //Constructor made for Book object which will be added to table , so purchased date and purchased price are not needed
   public Book(String ISBN, String name, String author,
               String category, int supplierid, String description,
-              String bookURL, double originalPrice, double sellingPrice, int quantity) {
+              Image image, double originalPrice, double sellingPrice, int quantity) {
     this.ISBN = ISBN;
     this.title = name;
     this.author = author;
     this.category = category;
     supplier = Supplier.getSupplierDB(supplierid);
     this.description = description;
-    ImageView image = new ImageView(bookURL);
+    setBookImageProperty(image);
     this.originalPrice = originalPrice;
     this.sellingPrice = sellingPrice;
     this.quantity = quantity;
@@ -37,7 +41,7 @@ public class Book  {
   //Constructor made for Book object which will be bought
   public Book(String ISBN, String name, String author,
               String category, Supplier supplier, String description,
-              String bookURL, Date purchaseDate, double purchasedPrice,
+              Image image, Date purchaseDate, double purchasedPrice,
               double originalPrice, double sellingPrice, int quantity) {
     this.ISBN = ISBN;
     this.title = name;
@@ -45,7 +49,7 @@ public class Book  {
     this.category = category;
     this.supplier = supplier;
     this.description = description;
-    this.bookURL = bookURL;
+    setBookImageProperty(image);
     this.purchaseDate = purchaseDate;
     this.purchasedPrice = purchasedPrice;
     this.originalPrice = originalPrice;
@@ -61,11 +65,11 @@ public class Book  {
     this.ISBN = ISBN;
   }
 
-  public String gettitle() {
+  public String getTitle() {
     return title;
   }
 
-  public void settitle(String name) {
+  public void setTitle(String name) {
     this.title = name;
   }
 
@@ -77,75 +81,75 @@ public class Book  {
     this.author = author;
   }
 
-  public String getcategory() {
+  public String getCategory() {
     return category;
   }
 
-  public void setcategory(String category) {
+  public void setCategory(String category) {
     this.category = category;
   }
 
-  public Supplier getsupplier() {
+  public Supplier getSupplier() {
     return supplier;
   }
 
-  public void setsupplier(Supplier supplier) {
+  public void setSupplier(Supplier supplier) {
     this.supplier = supplier;
   }
 
-  public String getdescription() {
+  public String getDescription() {
     return description;
   }
 
-  public void setdescription(String description) {
+  public void setDescription(String description) {
     this.description = description;
   }
 
-  public ImageView getbookURL() {
-    return new ImageView(bookURL);
+  public ImageView getBookImageProperty() {
+    return bookImageProperty.get();
   }
 
-  public void setbookURL(String bookURL) {
-    this.bookURL = bookURL;
+  public void setBookImageProperty(Image image) {
+    this.bookImageProperty.set(new ImageView(image));
   }
 
-  public Date getpurchaseDate() {
+  public Date getPurchaseDate() {
     return purchaseDate;
   }
 
-  public void setpurchaseDate(Date purchaseDate) {
+  public void setPurchaseDate(Date purchaseDate) {
     this.purchaseDate = purchaseDate;
   }
 
-  public double getpurchasedPrice() {
+  public double getPurchasedPrice() {
     return purchasedPrice;
   }
 
-  public void setpurchasedPrice(double purchasedPrice) {
+  public void setPurchasedPrice(double purchasedPrice) {
     this.purchasedPrice = purchasedPrice;
   }
 
-  public double getoriginalPrice() {
+  public double getOriginalPrice() {
     return originalPrice;
   }
 
-  public void setoriginalPrice(double originalPrice) {
+  public void setOriginalPrice(double originalPrice) {
     this.originalPrice = originalPrice;
   }
 
-  public double getsellingPrice() {
+  public double getSellingPrice() {
     return sellingPrice;
   }
 
-  public void setsellingPrice(double sellingPrice) {
+  public void setSellingPrice(double sellingPrice) {
     this.sellingPrice = sellingPrice;
   }
 
-  public int getquantity() {
+  public int getQuantity() {
     return quantity;
   }
 
-  public void setquantity(int quantity) {
+  public void setQuantity(int quantity) {
     this.quantity = quantity;
   }
 
@@ -164,7 +168,6 @@ public class Book  {
             ", category='" + category + '\'' +
             ", supplier='" + supplier + '\'' +
             ", description='" + description + '\'' +
-            ", bookURL='" + bookURL + '\'' +
             ", purchaseDate=" + purchaseDate +
             ", purchasedPrice=" + purchasedPrice +
             ", originalPrice=" + originalPrice +

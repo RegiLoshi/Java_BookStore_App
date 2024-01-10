@@ -1,6 +1,7 @@
 package application.bookstore.views;
 
 import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.controllers.BookList;
 import application.bookstore.models.Book;
 import application.bookstore.models.Role;
 import javafx.geometry.Pos;
@@ -10,7 +11,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 
 public class BookView implements DatabaseConnector {
@@ -54,6 +58,23 @@ public class BookView implements DatabaseConnector {
         titleCol.setCellValueFactory(
                 new PropertyValueFactory<>("title"));
         titleCol.setMinWidth(115);
+        titleCol.setCellFactory(col -> {
+            TableCell<Book, String> cell = new TableCell<Book, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        Text text = new Text(item);
+                        text.wrappingWidthProperty().bind(titleCol.widthProperty());
+                        setGraphic(text);
+                        setWrapText(true);
+                    }
+                }
+            };
+            return cell;
+        });
 
         TableColumn<Book, String> authorCol = new TableColumn<>("Author");
         authorCol.setCellValueFactory(
@@ -68,24 +89,64 @@ public class BookView implements DatabaseConnector {
         TableColumn<Book, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setCellValueFactory(
                 new PropertyValueFactory<>("description"));
+        descriptionCol.setCellFactory(col -> {
+            TableCell<Book, String> cell = new TableCell<Book, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        Text text = new Text(item);
+                        text.wrappingWidthProperty().bind(descriptionCol.widthProperty());
+                        setGraphic(text);
+                        setWrapText(true);
+                    }
+                }
+            };
+            return cell;
+        });
+
         descriptionCol.setMinWidth(160);
 
-        TableColumn<Book, ImageView> imageCol = new TableColumn<>("Image");
-        imageCol.setCellValueFactory(
-                new PropertyValueFactory<>("bookURL"));
-        imageCol.setMinWidth(160);
+        TableColumn<Book, ImageView> imageCol = getBookImageViewTableColumn();
 
         TableColumn<Book, Integer> quantityCol = new TableColumn<>("Quantity");
         quantityCol.setCellValueFactory(
                 new PropertyValueFactory<>("quantity"));
         quantityCol.setMinWidth(115);
 
-        tableView.getColumns().addAll(isbnCol , titleCol , authorCol , quantityCol ,
+        tableView.getColumns().addAll(isbnCol , titleCol , authorCol ,
                 categoryCol , descriptionCol , imageCol  , quantityCol);
+
+        BookList bookList = new BookList();
+        ArrayList <Book> books = bookList.getBooks();
+        tableView.getItems().addAll(books);
 
         pane.setCenter(tableView);
         pane.setTop(hbox);
         stage.setTitle("Books");
         return new Scene(pane, 1000 , 700 );
+    }
+
+    private static TableColumn<Book, ImageView> getBookImageViewTableColumn() {
+        TableColumn<Book, ImageView> imageCol = new TableColumn<>("Image");
+        imageCol.setCellValueFactory(new PropertyValueFactory<>("bookImageProperty"));
+        imageCol.setCellFactory(col -> new TableCell<Book, ImageView>() {
+            @Override
+            protected void updateItem(ImageView item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    item.setFitWidth(50);
+                    item.setFitHeight(50);
+
+                    setGraphic(item);
+                }
+            }
+        });
+        imageCol.setMinWidth(160);
+        return imageCol;
     }
 }

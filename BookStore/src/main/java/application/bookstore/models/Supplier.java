@@ -25,7 +25,7 @@ public class Supplier implements DatabaseConnector {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM Supplier where id = " + supplierId);
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM Supplier where SupplierId = " + supplierId);
                 if (resultSet.next()) {
                     String name = resultSet.getString("name");
                     String email = resultSet.getString("email");

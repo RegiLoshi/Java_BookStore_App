@@ -14,7 +14,7 @@ public class Bill {
         this.orderId++;
         this.booksSold = booksSold;
         for(SoldBookType books:booksSold)
-            amount += books.getSoldBook().getsellingPrice() * books.getSoldQuantity();
+            amount += books.getSoldBook().getSellingPrice() * books.getSoldQuantity();
         this.dateIssued=date;
     }
 

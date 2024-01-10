@@ -2,17 +2,13 @@ package application.bookstore.controllers;
 
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.models.Book;
+import javafx.scene.image.Image;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class BookList implements DatabaseConnector {
-    ArrayList<Book> books;
-    /*public Book(String ISBN, String name, String author,
-              String category, int supplierid, String description,
-              String bookURL, double originalPrice, double sellingPrice, int quantity){
-
-     */
+    ArrayList<Book> books = new ArrayList<>();
     public ArrayList<Book> getBooks() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -21,11 +17,12 @@ public class BookList implements DatabaseConnector {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM Book");
 
             while (resultSet.next()) {
-                books.add(new Book(resultSet.getString("ISBN"), resultSet.getString("name"),
+                Book book = new Book(resultSet.getString("ISBN"), resultSet.getString("name"),
                         resultSet.getString("author"), resultSet.getString("category"),
-                        resultSet.getInt("supplier") ,resultSet.getString("description"),
-                        resultSet.getString("bookURL"), resultSet.getDouble("originalPrice"),
-                        resultSet.getDouble("sellingPrice"), resultSet.getInt("quantity")));
+                        resultSet.getInt("supplierId") ,resultSet.getString("description"),
+                        new Image(resultSet.getString("bookURL")), resultSet.getDouble("original_price"),
+                        resultSet.getDouble("selling_price"), resultSet.getInt("quantity"));
+                books.add(book);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
