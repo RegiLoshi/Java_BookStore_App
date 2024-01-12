@@ -15,7 +15,7 @@ public class Main extends Application implements DatabaseConnector {
         stage.setScene(lg.showView(stage));
         stage.show();
     }
-
+    //testing changes
     public static void main(String[] args) {
         launch();
     }
