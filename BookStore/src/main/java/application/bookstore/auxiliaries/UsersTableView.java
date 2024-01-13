@@ -1,12 +1,16 @@
 package application.bookstore.auxiliaries;
 
 import application.bookstore.models.User;
+import application.bookstore.views.AddNewUserDialog;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -17,6 +21,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.sql.*;
+import java.util.Optional;
 
 public class UsersTableView extends VBox implements DatabaseConnector{
 
@@ -148,15 +153,28 @@ public class UsersTableView extends VBox implements DatabaseConnector{
         addButton=new Button("Add");
         addButton.setPrefWidth(100);
         addButton.setFont(Font.font(20));
-        addButton.setOnAction(e->{
-            Stage addUserStage = new Stage();
-            addUserStage.setTitle("Add User");
+        addButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try
+                {
+                    Dialog<User> userDialog = new AddNewUserDialog(
+                            new User(new SimpleStringProperty(""),new SimpleStringProperty(""),
+                                    new SimpleStringProperty(""),new SimpleStringProperty(""),
+                                    new SimpleStringProperty(""),new SimpleStringProperty(""),
+                                    new SimpleStringProperty("")));
+                    Optional<User> result = userDialog.showAndWait();
+                    if (result.isPresent()) {
+                        User user = result.get();
+                        add(user);
+                    }
+                }catch (Exception e)
+                {
+                    System.out.println("Something wrong with the dialog");
+                    e.printStackTrace();
+                }
 
-            AddNewUserPane addNewUserPane=new AddNewUserPane(users,addUserStage);
-            addNewUserPane.setAlignment(Pos.CENTER);
-
-            addUserStage.setScene(new Scene(addNewUserPane,700,650));
-            addUserStage.show();
+            }
         });
 
         removeButton=new Button("Remove");
@@ -164,12 +182,64 @@ public class UsersTableView extends VBox implements DatabaseConnector{
         removeButton.setFont(Font.font(20));
         hBox.getChildren().addAll(addButton,removeButton);
 
+        removeButton.setOnAction(e->
+        {
+            int row=tableView.getSelectionModel().getSelectedIndex();
+
+            if (row >= 0 && row < tableView.getItems().size()) {
+                User u = tableView.getItems().get(row);
+
+                //Removing from database
+                String query="DELETE FROM user where userName=?";
+                try {
+                    Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+                    PreparedStatement preparedStatement=connection.prepareStatement(query);
+                    preparedStatement.setString(1,u.getUsername());
+                    int rowsAffected = preparedStatement.executeUpdate();
+                } catch (SQLException ex) {
+                    System.out.println("Did not sign in to DB");
+                    ex.printStackTrace();
+                }
+
+                //removing from tableView and users
+                removeRow(row);
+            }
+        });
+
         getChildren().addAll(tableView,hBox);
     }
 
     public void add(User user) {
-        users.add(user);
-        tableView.getItems().add(user);
+        //Adding user to the list
+        users.add(user); //will also automatically be added to the tableView
+
+        for(User u:users)
+        {
+            System.out.println(u);
+        }
+
+        //adding user to database
+        String query="INSERT INTO User (firstName, lastName, email, userName, password, gender, Role) VALUES" +
+                "(?,?,?,?,?,?,?);";
+        try {
+            Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1,user.getFirstName());
+            preparedStatement.setString(2,user.getLastName());
+            preparedStatement.setString(3,user.getEmail());
+            preparedStatement.setString(4,user.getPassword());
+            preparedStatement.setString(5,user.getUsername());;
+            preparedStatement.setString(6,user.getGender());
+            preparedStatement.setString(7,user.getRoleString());
+
+
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Did not sign in to DB");
+            ex.printStackTrace();
+        }
+
     }
 
     public void updateRowInDatabase(User user,String columnName,String newValue,String conditionColumn,String conditionValue)
@@ -187,10 +257,11 @@ public class UsersTableView extends VBox implements DatabaseConnector{
         }
 
     }
+    public void removeRow(int row)
+    {
+        tableView.getItems().remove(row);
+
+    }
 
 }
-/*
-lastNameColumn = new TableColumn<User, String>("Last Name");
-        lastNameColumn.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
-        AllowingEditing(lastNameColumn);
-*/
+

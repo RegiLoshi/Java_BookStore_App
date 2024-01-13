@@ -1,24 +1,15 @@
 package application.bookstore.views;
 
-import application.bookstore.auxiliaries.AddNewUserPane;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.auxiliaries.UsersTableView;
-import application.bookstore.models.Role;
 import application.bookstore.models.User;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 
 import java.sql.*;
 
@@ -73,84 +64,7 @@ public class OtherUsersView implements DatabaseConnector {
 
         usersTableView=new UsersTableView(users);
 
-        VBox buttonsVbox = new VBox();
-        buttonsVbox.setSpacing(20);
-        buttonsVbox.setPadding(new Insets(40,30,30,30));
-
-        Button addManager=new Button("Add manager");
-        addManager.setFont(Font.font(20));
-
-        Button removeManager=new Button("Remove manager");
-        removeManager.setFont(Font.font(20));
-
-        Button addLibrarian=new Button("Add librarian");
-        addLibrarian.setFont(Font.font(20));
-
-        Button removeLibrarian=new Button("Remove librarian");
-        removeLibrarian.setFont(Font.font(20));
-
-        buttonsVbox.getChildren().addAll(addLibrarian,removeLibrarian,addManager,removeManager);
-
         borderPane.setTop(usersTableView);
-        borderPane.setLeft(buttonsVbox);
-
-        //-----------Handling the events
-        Stage addUserStage = new Stage();
-        addUserStage.setTitle("Add User");
-        addLibrarian.setOnAction(e -> {
-            /*
-            try {
-                Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-                Statement statement = connection.createStatement();
-                int rowsAffected =statement.executeUpdate("DELETE  FROM user where Role='manager'");
-            } catch (SQLException ex) {
-                System.out.println("Did not sign in to DB");
-                ex.printStackTrace();
-
-                 StackPane CenteringAddNewUserPane=new StackPane();
-                  CenteringAddNewUserPane.getChildren().add(addNewUserPane);
-
-            addUserStage.setScene(new Scene(CenteringAddNewUserPane,700,650));
-            }
-
-             */
-             AddNewUserPane addNewUserPane=new AddNewUserPane(users,addUserStage);
-            addNewUserPane.setAlignment(Pos.CENTER);
-
-            addUserStage.setScene(new Scene(addNewUserPane,700,650));
-            addUserStage.show();
-
-        });
-
-        removeManager.setOnAction(e -> {
-            /*
-            try {
-                Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-                Statement statement = connection.createStatement();
-                int rowsAffected =statement.executeUpdate("DELETE  FROM user where Role='manager'");
-                //exceuteUpdate need to be used for DELETE, UPDATE, or INSERT not executeQuery
-            } catch (SQLException ex) {
-                System.out.println("Did not sign in to DB");
-                ex.printStackTrace();
-            }
-
-             */
-            for (User u : users)
-            {
-                System.out.println(u);
-            }
-        });
-
-        removeLibrarian.setOnAction(e -> {
-            try {
-                Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-                Statement statement = connection.createStatement();
-                int rowsAffected =statement.executeUpdate("DELETE FROM user where Role='librarian'");
-            } catch (SQLException ex) {
-                System.out.println("Did not sign in to DB");
-                ex.printStackTrace();
-            }
-        });
 
         Scene scene = new Scene(borderPane, 1000, 700);
 

@@ -27,6 +27,8 @@ public class User {
 
     //The StringProperties are used in the UsersTableView to set the CellValueFactory
 
+    public User(){}
+
     public User(StringProperty firstName, StringProperty lastName,
                 StringProperty email, StringProperty username, StringProperty password,
                 StringProperty gender, StringProperty role) {
@@ -120,7 +122,7 @@ public class User {
     }
     public String getRoleString()
     {
-        return role.toString();
+        return role.get();
     }
 
     @Override
