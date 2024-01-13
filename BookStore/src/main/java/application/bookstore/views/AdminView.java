@@ -63,14 +63,13 @@ public class AdminView {
 		profile_button.setPrefWidth(150);
 		profile_button.setBackground(null);
 
-		/*
+
 		profile_button.setOnAction(e -> {
 			Stage popup = new Stage();
 			ProfileView profileView = new ProfileView(user);
 			popup.setScene(profileView.showView(popup));
 			popup.show();
 		});
-		*/
 
 
 		other_users_buttons = new Button("",buttonImages[1]);
@@ -108,7 +107,7 @@ public class AdminView {
 
 		center = new VBox();
 
-		welcome_user = new Label("Welcome Admin"); 												//!!!!!!!!!!!! Replace with the class.getUsername(); to make it Dynamic depending on which users logs in
+		welcome_user = new Label("Welcome " + user.getFirstName() + " " + user.getLastName()); 												//!!!!!!!!!!!! Replace with the class.getUsername(); to make it Dynamic depending on which users logs in
 		welcome_user.setStyle(
 				"-fx-font-size: 40px;" + // Set font size to 24 pixels							//!!!!!!! Not Finished yet the style will be changed to match background and look better
 						"-fx-font-family: 'Arial';" + // Set font family to Arial

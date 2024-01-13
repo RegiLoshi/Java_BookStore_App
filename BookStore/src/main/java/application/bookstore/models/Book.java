@@ -4,6 +4,8 @@ package application.bookstore.models;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 import java.util.Date;
 
@@ -21,6 +23,7 @@ public class Book  {
     private int quantity;
 
     private Supplier supplier;
+    private final IntegerProperty chosenQuantity = new SimpleIntegerProperty(0);
 
     //Constructor made for Book object which will be added to table , so purchased date and purchased price are not needed
   public Book(String ISBN, String name, String author,
@@ -156,6 +159,18 @@ public class Book  {
   public void decrementQuantity(int x)
   {
     this.quantity-=x;
+  }
+
+  public final IntegerProperty chosenQuantityProperty() {
+    return this.chosenQuantity;
+  }
+
+  public final int getChosenQuantity() {
+    return this.chosenQuantityProperty().get();
+  }
+
+  public final void setChosenQuantity(int chosenQuantity) {
+    this.chosenQuantityProperty().set(chosenQuantity);
   }
 
   @Override
