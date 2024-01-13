@@ -1,12 +1,22 @@
 package application.bookstore.auxiliaries;
 
 import application.bookstore.models.Role;
+import application.bookstore.models.User;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
-public class AddNewUserPane extends GridPane {
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class AddNewUserPane extends GridPane implements DatabaseConnector{
     private Label firstNameL;
     private TextField firstNameField;
     private Label LastNameL;
@@ -23,14 +33,17 @@ public class AddNewUserPane extends GridPane {
     private RadioButton male;
     private RadioButton female;
     private RadioButton other;
-    private String role;
+    private Label role;
+    private RadioButton admin;
+    private RadioButton manager;
+    private RadioButton librarian;
+    private ObservableList<User> users;
+    Stage stage;
 
-    public AddNewUserPane(Role role){
-        if(role.equals(Role.MANAGER))
-            this.role="Manager";
-        else if(role.equals(Role.LIBRARIAN))
-            this.role="Librarian";
-
+    public AddNewUserPane(ObservableList<User> users,Stage st)
+    {
+        this.stage=st;
+        this.users=users;
         createPane();
     }
 
@@ -95,26 +108,83 @@ public class AddNewUserPane extends GridPane {
         other.setToggleGroup(tg);
 
         add(genderL, 0, 6);
-        HBox b = new HBox();
-        b.getChildren().addAll(male, female, other);
-        add(b, 1, 6);
+        HBox genderButtons = new HBox(male,female,other);
+        genderButtons.setSpacing(10);
+        add(genderButtons, 1, 6);
+
+        role = new Label("Role");
+        role.setFont(Font.font(25));
+        ToggleGroup tg2 = new ToggleGroup();
+        admin = new RadioButton("Admin");
+        manager = new RadioButton("Manager");
+        librarian = new RadioButton("Librarian");
+        admin.setFont(Font.font(22));
+        manager.setFont(Font.font(22));
+        librarian.setFont(Font.font(22));
+        admin.setToggleGroup(tg2);
+        manager.setToggleGroup(tg2);
+        librarian.setToggleGroup(tg2);
+
+        add(role,0,7);
+        HBox roleButtons=new HBox(admin,manager,librarian);
+        roleButtons.setSpacing(10);
+        add(roleButtons,1,7);
 
         HBox hBox=new HBox();
         hBox.setSpacing(15);
-        Button button=new Button();
+        Button button=new Button("Add");
         Button button1=new Button("Cancel");
 
-        if(role.equalsIgnoreCase("librarian"))
-            button = new Button("Add Librarian");
-        else if(role.equalsIgnoreCase("manager"))
-            button=new Button("Add Manager");
-
         button.setFont(Font.font(25));
+        button.setPrefWidth(200);
         button1.setFont(Font.font(25));
+        button1.setPrefWidth(200);
+        hBox.setPadding(new Insets(20,10,10,10));
+
+        button1.setOnAction(e->
+        {
+            User newUser=new User(
+                    new SimpleStringProperty(getFirstName()),
+                    new SimpleStringProperty(getLastName()),
+                    new SimpleStringProperty(getEmail()),
+                    new SimpleStringProperty(getUsername()),
+                    new SimpleStringProperty(getPassword()),
+                    new SimpleStringProperty(getGender()),
+                    new SimpleStringProperty(getRole()));
+
+            users.add(newUser);
+            //Inserting the new User in the database
+            String insertSQL = "INSERT INTO user (firstName, lastName, email, userName, password, gender, Role) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (
+                    Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+                    PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)
+            ) {
+                preparedStatement.setString(1, newUser.getFirstName());
+                preparedStatement.setString(2, newUser.getLastName());
+                preparedStatement.setString(3, newUser.getEmail());
+                preparedStatement.setString(4, newUser.getUsername());
+                preparedStatement.setString(5, newUser.getPassword());
+                preparedStatement.setString(6, newUser.getGender());
+                preparedStatement.setString(7, newUser.getRoleString());
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                System.out.println("Rows affected: " + rowsAffected);
+            } catch (SQLException ex) {
+                System.out.println("Failed to insert into the database");
+                ex.printStackTrace();
+            }
+            stage.close();
+        });
+
+        button1.setOnAction(e->
+        {
+            stage.close();
+        });
 
         hBox.getChildren().addAll(button,button1);
 
-        add(hBox, 1, 7);
+        add(hBox, 1, 8);
     }
 
     public String getFirstName()
@@ -138,13 +208,25 @@ public class AddNewUserPane extends GridPane {
     {
         return passF.getText();
     }
-    public char getGender()
+
+    public String getRole()
+    {
+        if(admin.isSelected())
+            return "admin";
+        else if(manager.isSelected())
+            return "manager";
+
+        return "librarian";
+    }
+    public String getGender()
     {
         if(male.isSelected())
-            return 'M';
+            return "M";
         else if(female.isSelected())
-            return 'F';
+            return "F";
 
-        return 'U'; //by
+        return "O";
     }
+
+
 }

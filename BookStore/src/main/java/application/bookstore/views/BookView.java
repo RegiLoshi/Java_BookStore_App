@@ -4,6 +4,7 @@ import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.controllers.BookList;
 import application.bookstore.models.Book;
 import application.bookstore.models.Role;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -19,12 +20,12 @@ import java.util.ArrayList;
 
 public class BookView implements DatabaseConnector {
     BorderPane pane;
-    Role role;
+    StringProperty role;
     private Label search_label;
     private TextField search_field;
     private HBox hbox;
 
-    public BookView(Role role) {
+    public BookView(StringProperty role) {
         this.role = role;
     }
 

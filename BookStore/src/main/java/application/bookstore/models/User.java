@@ -1,24 +1,35 @@
 package application.bookstore.models;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 
 public class User {
 
     //These attributes are set to StringProperty so that they can be put in an
     //ObservableList, so that changes to their values can automatically be reflected
     //in the UI
+
+    /*#TODO
+    In database userId
+    */
     private StringProperty firstName;
     private StringProperty lastName;
     private StringProperty email;
     private StringProperty username;
     private StringProperty password;
     private StringProperty gender;
-    private Role role;
+    private StringProperty role;
+
+    //The StringProperties are used in the UsersTableView to set the CellValueFactory
 
     public User(StringProperty firstName, StringProperty lastName,
                 StringProperty email, StringProperty username, StringProperty password,
-                StringProperty gender, Role role) {
+                StringProperty gender, StringProperty role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -100,28 +111,16 @@ public class User {
         this.gender.set(gender);
     }
 
-    public Role getRole() {
+    public StringProperty getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRole(String role) {
+        this.role.set(role);
     }
-
     public String getRoleString()
     {
-        return role.name();
-    }
-
-    //Since we are working with observable properties we might need role as an observable value
-    public StringProperty getRoleStringProperty()
-    {
-        if(role.equals(Role.LIBRARIAN))
-            return new SimpleStringProperty("Librarian");
-        else if(role.equals(Role.MANAGER))
-            return new SimpleStringProperty("Manager");
-        else
-            return new SimpleStringProperty("Admin");
+        return role.toString();
     }
 
     @Override

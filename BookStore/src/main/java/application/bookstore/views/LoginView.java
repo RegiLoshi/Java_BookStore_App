@@ -84,27 +84,35 @@ public class LoginView implements DatabaseConnector {
                 alert.showAndWait();
             }
 
+            String query = "SELECT * FROM user WHERE username = ? AND password = ?";
+            //? is a placeholder
+
             try {
                 Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM user where Role='admin'");
 
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                //Binding parameters
+                preparedStatement.setString(1, username1);
+                preparedStatement.setString(2, password1);
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                //We expect only 1 row or 0 so if() is used instead of while
                 if (resultSet.next()) {
                     String username = resultSet.getString("username");
                     String password = resultSet.getString("password");
                     if (username1.equals(username) && password1.equals(password)) {
                         String role = resultSet.getString("Role").toLowerCase();
+                        user = new User(
+                                new SimpleStringProperty(resultSet.getString("firstName")),
+                                new SimpleStringProperty(resultSet.getString("lastName")),
+                                new SimpleStringProperty(resultSet.getString("email")),
+                                new SimpleStringProperty(username),
+                                new SimpleStringProperty(password),
+                                new SimpleStringProperty(resultSet.getString("gender")),
+                                new SimpleStringProperty(resultSet.getString("Role"))
+                        );
                         switch (role) {
                             case "admin":
-                                user = new User(
-                                        new SimpleStringProperty(resultSet.getString("firstName")),
-                                        new SimpleStringProperty(resultSet.getString("lastName")),
-                                        new SimpleStringProperty(resultSet.getString("email")),
-                                        new SimpleStringProperty(username),
-                                        new SimpleStringProperty(password),
-                                        new SimpleStringProperty(resultSet.getString("gender")),
-                                        Role.ADMIN
-                                );
                                 infoBox("Login Successful!", null, "Success");
                                 application.bookstore.views.AdminView adminView = new application.bookstore.views.AdminView(user);
                                 try {
@@ -114,34 +122,32 @@ public class LoginView implements DatabaseConnector {
                                     exception.printStackTrace();
                                 }
                                 break;
+                                /*
                             case "librarian":
-                                user = new User(
-                                        new SimpleStringProperty(resultSet.getString("firstName")),
-                                        new SimpleStringProperty(resultSet.getString("lastName")),
-                                        new SimpleStringProperty(resultSet.getString("email")),
-                                        new SimpleStringProperty(username),
-                                        new SimpleStringProperty(password),
-                                        new SimpleStringProperty(resultSet.getString("gender")),
-                                        Role.LIBRARIAN
-                                );
+                                infoBox("Login Successful!", null, "Success");
+                                application.bookstore.views.AdminView LibrarianView = new application.bookstore.views.LibrarianView(user);
+                                try {
+                                    stage.setScene(LibrarianView.showView(stage));
+                                } catch (Exception exception) {
+                                    System.out.println("Error in adminView");
+                                    exception.printStackTrace();
+                                }
                                 break;
                             case "manager":
-                                user = new User(
-                                        new SimpleStringProperty(resultSet.getString("firstName")),
-                                        new SimpleStringProperty(resultSet.getString("lastName")),
-                                        new SimpleStringProperty(resultSet.getString("email")),
-                                        new SimpleStringProperty(username),
-                                        new SimpleStringProperty(password),
-                                        new SimpleStringProperty(resultSet.getString("gender")),
-                                        Role.MANAGER
-                                );
+                                infoBox("Login Successful!", null, "Success");
+                                application.bookstore.views.AdminView ManagerView = new application.bookstore.views.ManagerView(user);
+                                try {
+                                    stage.setScene(ManagerView.showView(stage));
+                                } catch (Exception exception) {
+                                    System.out.println("Error in adminView");
+                                    exception.printStackTrace();
+                                }
                                 break;
+
                         }
-                    } else {
-                        infoBox("Please enter correct Email and Password", null, "Failed");
+                        */
+                        }
                     }
-                } else {
-                    System.out.println("No rows found in the result set.");
                 }
             } catch (SQLException ex) {
                 System.out.println("Did not sign in to DB");

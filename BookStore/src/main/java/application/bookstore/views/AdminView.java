@@ -63,13 +63,14 @@ public class AdminView {
 		profile_button.setPrefWidth(150);
 		profile_button.setBackground(null);
 
+		/*
 		profile_button.setOnAction(e -> {
 			Stage popup = new Stage();
 			ProfileView profileView = new ProfileView(user);
 			popup.setScene(profileView.showView(popup));
 			popup.show();
 		});
-
+		*/
 
 
 		other_users_buttons = new Button("",buttonImages[1]);
