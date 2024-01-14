@@ -3,11 +3,8 @@ package application.bookstore.views;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.controllers.BookList;
 import application.bookstore.models.Book;
-import application.bookstore.models.Role;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +34,7 @@ public class BookView implements DatabaseConnector {
     private TextField search_field;
     private HBox hbox;
     private Label totalSumLabel;
+    private ChoiceBox<Integer> choiceBox;
 
     public BookView(StringProperty role) {
         this.role = role;
@@ -79,7 +77,7 @@ public class BookView implements DatabaseConnector {
                 new PropertyValueFactory<>("title"));
         titleCol.setMinWidth(115);
         titleCol.setCellFactory(col -> {
-            TableCell<Book, String> cell = new TableCell<Book, String>() {
+            return new TableCell<Book, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -93,7 +91,6 @@ public class BookView implements DatabaseConnector {
                     }
                 }
             };
-            return cell;
         });
 
         TableColumn<Book, String> buyTitleCol = new TableColumn<>("Title");
@@ -199,7 +196,9 @@ public class BookView implements DatabaseConnector {
                         selectedBooks.add(chosen_book);
                     } else {
                         selectedBooks.remove(chosen_book);
+                        updateTotalSumLabel();
                     }
+                    buying_tableView.refresh();
                 });
                 return new SimpleObjectProperty<>(checkBox);
             }
@@ -228,6 +227,7 @@ public class BookView implements DatabaseConnector {
                 checkBox.selectedProperty().addListener((ov, old_val, new_val) -> {
                     if (!new_val){
                         selectedBooks.remove(chosen_book);
+                        choiceBox.setValue(0);
                     }
                 });
                 return new SimpleObjectProperty<CheckBox>(checkBox);
@@ -247,7 +247,7 @@ public class BookView implements DatabaseConnector {
         TableColumn<Book, ChoiceBox<Integer>> buyQuantityCol = new TableColumn<>("Choose Quantity");
         buyQuantityCol.setCellValueFactory(cellData -> {
             Book book = cellData.getValue();
-            ChoiceBox<Integer> choiceBox = new ChoiceBox<>();
+            choiceBox = new ChoiceBox<>();
             for (int i = 0; i <= book.getQuantity(); i++) {
                 choiceBox.getItems().add(i);
             }
@@ -288,7 +288,27 @@ public class BookView implements DatabaseConnector {
         totalSumLabel = new Label("Total amount ");
         totalSumLabel.setStyle("-fx-font-size: 20px;");
 
-        hbox_bottom.getChildren().addAll(totalSumLabel , generateBill);
+        Button clearAllButton = new Button("Clear");
+        clearAllButton.setMinWidth(50);
+        clearAllButton.setMinHeight(50);
+        clearAllButton.setOnAction(event -> {
+            selectedBooks.clear();
+            tableView.refresh();
+            buying_tableView.refresh();
+            updateTotalSumLabel();
+        });
+
+        if(!(role.toString().equalsIgnoreCase("librarian"))){
+            Button addBook = new Button("Add Book");
+            Button removeBook = new Button("Remove Book");
+            addBook.setMinWidth(50);
+            addBook.setMinHeight(50);
+            removeBook.setMinWidth(50);
+            removeBook.setMinHeight(50);
+            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton , addBook ,removeBook);
+        }else{
+            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton);
+        }
         hbox_bottom.setAlignment(Pos.CENTER);
         hbox_bottom.setSpacing(30);
         hbox_bottom.setMinWidth(150);
@@ -323,7 +343,7 @@ public class BookView implements DatabaseConnector {
     private double calculateTotalSum() {
         double totalSum = 0.0;
         for (Book book : selectedBooks) {
-            double originalPrice = book.getSellingPrice(); // Replace with the actual property
+            double originalPrice = book.getSellingPrice();
             int chosenQuantity = book.getChosenQuantity();
             totalSum += originalPrice * chosenQuantity;
         }
