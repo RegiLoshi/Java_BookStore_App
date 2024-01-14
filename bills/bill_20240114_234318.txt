@@ -1,0 +1,9 @@
+Sold by: admin admin Role: admin
+
+Books:
+A Game of Thrones - $40.0
+Harry Potter and the Philosopher's Stone - $30.0
+The Shining - $35.0
+secondtest - $1249.0
+
+Total Amount: $2713.0

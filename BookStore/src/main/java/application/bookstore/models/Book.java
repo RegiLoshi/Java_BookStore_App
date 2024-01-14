@@ -1,29 +1,37 @@
 package application.bookstore.models;
 
 
+import application.bookstore.auxiliaries.DatabaseConnector;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 
-public class Book  {
 
-  private int supplierid;
-  private String ISBN,title,author,category,
-        description;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
+
+public class Book  implements DatabaseConnector {
+  private int supplierid = 1;
+  private String ISBN, title, author, category, description;
   private SimpleObjectProperty<ImageView> bookImageProperty = new SimpleObjectProperty<>();
-
-    private Date purchaseDate;
-
-    private double purchasedPrice, originalPrice,sellingPrice;
-    private int quantity;
-
-    private Supplier supplier;
-    private final IntegerProperty chosenQuantity = new SimpleIntegerProperty(0);
+  private Date purchaseDate;
+  private double purchasedPrice, originalPrice, sellingPrice;
+  private int quantity;
+  private Supplier supplier;
+  private final IntegerProperty chosenQuantity = new SimpleIntegerProperty(0);
+  private String imageUrl;
 
     //Constructor made for Book object which will be added to table , so purchased date and purchased price are not needed
   public Book(String ISBN, String name, String author,
@@ -34,6 +42,19 @@ public class Book  {
     this.author = author;
     this.category = category;
     supplier = Supplier.getSupplierDB(supplierid);
+    this.description = description;
+    setBookImageProperty(image);
+    this.originalPrice = originalPrice;
+    this.sellingPrice = sellingPrice;
+    this.quantity = quantity;
+  }
+
+  public Book(String ISBN, String name, String author, String category, String description,
+              Image image, double originalPrice, double sellingPrice, int quantity) {
+    this.ISBN = ISBN;
+    this.title = name;
+    this.author = author;
+    this.category = category;
     this.description = description;
     setBookImageProperty(image);
     this.originalPrice = originalPrice;
@@ -55,6 +76,17 @@ public class Book  {
     setBookImageProperty(image);
     this.purchaseDate = purchaseDate;
     this.purchasedPrice = purchasedPrice;
+    this.originalPrice = originalPrice;
+    this.sellingPrice = sellingPrice;
+    this.quantity = quantity;
+  }
+
+  public Book(String ISBN, String title, String author, String cat, String desc, double originalPrice, double sellingPrice, int quantity) {
+    this.ISBN = ISBN;
+    this.title = title;
+    this.author = author;
+    this.category = cat;
+    this.description = desc;
     this.originalPrice = originalPrice;
     this.sellingPrice = sellingPrice;
     this.quantity = quantity;
@@ -173,6 +205,8 @@ public class Book  {
     this.chosenQuantityProperty().set(chosenQuantity);
   }
 
+
+
   @Override
   public String toString() {
     return "Book{" +
@@ -189,6 +223,57 @@ public class Book  {
             ", sellingPrice=" + sellingPrice +
             ", quantity=" + quantity +
             '}';
+  }
+  public void saveImageLocally(File sourceImageFile) {
+    try {
+      String baseFolderPath = System.getProperty("user.dir");
+      String subFolderPath = "BookImages";
+      String folderPath = baseFolderPath + File.separator + subFolderPath;
+      String destinationPath = folderPath + File.separator + ISBN + ".png";
+
+      Files.createDirectories(Paths.get(baseFolderPath));
+      Files.createDirectories(Paths.get(folderPath));
+      Files.copy(sourceImageFile.toPath(), new File(destinationPath).toPath(), StandardCopyOption.REPLACE_EXISTING);
+      this.imageUrl = "file:" + File.separator + File.separator + destinationPath;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+  }
+  public Image getLocalImage() {
+    if (imageUrl != null && !imageUrl.isEmpty()) {
+      return new Image(imageUrl);
+    }
+    return null;
+  }
+
+  public void saveToDatabase() {
+    try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
+      String sql = "INSERT INTO Book (ISBN, name, author, category, supplierId, description, bookURL, original_price, selling_price, quantity) " +
+              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+      try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        preparedStatement.setString(1, ISBN);
+        preparedStatement.setString(2, title);
+        preparedStatement.setString(3, author);
+        preparedStatement.setString(4, category);
+        preparedStatement.setInt(5, 1);
+        preparedStatement.setString(6, description);
+        preparedStatement.setString(7, imageUrl);
+        preparedStatement.setDouble(8, originalPrice);
+        preparedStatement.setDouble(9, sellingPrice);
+        preparedStatement.setInt(10, quantity);
+        preparedStatement.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 }
 

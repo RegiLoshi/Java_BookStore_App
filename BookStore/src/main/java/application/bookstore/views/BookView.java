@@ -1,8 +1,10 @@
 package application.bookstore.views;
 
 import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.controllers.BookController;
 import application.bookstore.controllers.BookList;
 import application.bookstore.models.Book;
+import application.bookstore.models.User;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -35,9 +37,13 @@ public class BookView implements DatabaseConnector {
     private HBox hbox;
     private Label totalSumLabel;
     private ChoiceBox<Integer> choiceBox;
+    private User user;
+    private BookList bookList;
+    private ArrayList<Book> books;
 
-    public BookView(StringProperty role) {
+    public BookView(StringProperty role ,User user) {
         this.role = role;
+        this.user = user;
     }
 
     public Scene showView(Stage stage) {
@@ -247,7 +253,7 @@ public class BookView implements DatabaseConnector {
         TableColumn<Book, ChoiceBox<Integer>> buyQuantityCol = new TableColumn<>("Choose Quantity");
         buyQuantityCol.setCellValueFactory(cellData -> {
             Book book = cellData.getValue();
-            choiceBox = new ChoiceBox<>();
+            ChoiceBox<Integer> choiceBox = new ChoiceBox<>();
             for (int i = 0; i <= book.getQuantity(); i++) {
                 choiceBox.getItems().add(i);
             }
@@ -255,12 +261,12 @@ public class BookView implements DatabaseConnector {
             choiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
                 book.setChosenQuantity(newVal);
                 updateTotalSumLabel();
-                totalPriceCol.getTableView().refresh();
             });
 
             return new SimpleObjectProperty<>(choiceBox);
         });
         buyQuantityCol.setMinWidth(115);
+
 
 
         buying_tableView.getColumns().addAll(buyselectCol , buyQuantityCol , sellingPrice_col,totalPriceCol, buyIsbnCol , buyTitleCol , buyAuthorCol
@@ -272,8 +278,8 @@ public class BookView implements DatabaseConnector {
         tableView.getColumns().addAll(selectCol , isbnCol , titleCol , authorCol ,
                 categoryCol , descriptionCol , imageCol  , quantityCol);
 
-        BookList bookList = new BookList();
-        ArrayList <Book> books = bookList.getBooks();
+        bookList = new BookList();
+        books = bookList.getBooks();
         tableView.getItems().addAll(books);
 
         VBox tables = new VBox();
@@ -285,6 +291,20 @@ public class BookView implements DatabaseConnector {
         Button generateBill = new Button("Generate Bill");
         generateBill.setMinWidth(50);
         generateBill.setMinHeight(50);
+        generateBill.setOnAction( e->{
+            BookController.generateBill(user , selectedBooks , calculateTotalSum() );
+            for (Book selectedBook : selectedBooks) {
+                int newQuantity = selectedBook.getQuantity() - selectedBook.getChosenQuantity();
+                selectedBook.setQuantity(newQuantity);
+            }
+            selectedBooks.clear();
+            tableView.refresh();
+            buying_tableView.refresh();
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText("Successfully Generated Bill");
+            alert.show();
+        });
         totalSumLabel = new Label("Total amount ");
         totalSumLabel.setStyle("-fx-font-size: 20px;");
 
@@ -300,6 +320,16 @@ public class BookView implements DatabaseConnector {
 
         if(!(role.toString().equalsIgnoreCase("librarian"))){
             Button addBook = new Button("Add Book");
+            addBook.setOnAction(event -> {
+                Stage popup = new Stage();
+                AddBookView addBookView = new AddBookView();
+                try {
+                    popup.setScene(addBookView.showView(popup));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                popup.show();
+            });
             Button removeBook = new Button("Remove Book");
             addBook.setMinWidth(50);
             addBook.setMinHeight(50);
