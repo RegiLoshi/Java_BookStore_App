@@ -59,4 +59,16 @@ public class BookController implements DatabaseConnector {
             }
         }
     }
+
+    public static void deleteBook(String isbn) {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
+            String deleteSql = "DELETE FROM Book WHERE ISBN = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSql)) {
+                preparedStatement.setString(1, isbn);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

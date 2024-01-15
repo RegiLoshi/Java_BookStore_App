@@ -9,20 +9,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.image.ImageView;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
-public class AddBookView {
+public class EditBookView {
     private GridPane pane;
     private BorderPane mainpane;
     private HBox hbox;
@@ -61,14 +57,18 @@ public class AddBookView {
     private Label image_label;
     private Book book;
 
+    public EditBookView(Book book){
+        this.book = book;
+    }
+
     public Scene showView(Stage stage) throws Exception {
         mainpane = new BorderPane();
         pane = createBookEntryForm();
         hbox = new HBox();
-        addBook = new Button("Add Book");
+        addBook = new Button("Edit Book");
         addBook.setMinHeight(50);
         addBook.setMinWidth(150);
-        addBook.setOnAction(e -> {createBook(); stage.close();});
+        addBook.setOnAction(e -> {editBook(); stage.close();});
         cancelButton = new Button("Cancel");
         cancelButton.setMinHeight(50);
         cancelButton.setMinWidth(150);
@@ -90,7 +90,7 @@ public class AddBookView {
         addBook.setStyle("-fx-font-size: 18;");
         cancelButton.setStyle("-fx-font-size: 18;");
 
-        stage.setTitle("Add Book");
+        stage.setTitle("Edit Book");
         return new Scene(mainpane, 800, 800);
     }
 
@@ -129,7 +129,8 @@ public class AddBookView {
         supplierAddressLabel.setStyle("-fx-font-size: 16;");
         image_label.setStyle("-fx-font-size: 16;");
 
-        isbnTextField = new TextField();
+        isbnTextField = new TextField(book.getISBN());
+        isbnTextField.setEditable(false);
         titleTextField = new TextField();
         authorTextField = new TextField();
         categoryTextField = new TextField();
@@ -146,7 +147,7 @@ public class AddBookView {
         imageView = new ImageView();
         imageView.setFitWidth(150);
         imageView.setFitHeight(150);
-        
+
         Button chooseImageButton = new Button("Choose Image");
         chooseImageButton.setMinHeight(50);
         chooseImageButton.setMinWidth(150);
@@ -183,39 +184,25 @@ public class AddBookView {
             imageView.setImage(image);
         }
     }
-    public Book createBook() {
+    public Book editBook() {
         try {
+            book.setTitle(titleTextField.getText());
+            book.setAuthor(authorTextField.getText());
+            book.setCategory(categoryTextField.getText());
+            book.setDescription(descriptionTextField.getText());
+            book.setOriginalPrice(Double.parseDouble(originalPriceTextField.getText()));
+            book.setSellingPrice(Double.parseDouble(sellingPriceTextField.getText()));
+            book.setQuantity(Integer.parseInt(quantityTextField.getText()));
             Supplier supplier = new Supplier(supplierNameTextField.getText() , supplierEmailTextField.getText() ,
                     supplierPhoneLabel.getText() , supplierAddressTextField.getText());
             supplier.findSupplierId();
-            if(!(supplier.supplierExists(supplier.getSupplierId()))) {
-                supplier.saveToDatabase();
-            }
-            book = new Book(
-                    isbnTextField.getText(),
-                    titleTextField.getText(),
-                    authorTextField.getText(),
-                    categoryTextField.getText(),
-                    supplier.getSupplierId(),
-                    descriptionTextField.getText(),
-                    Double.parseDouble(originalPriceTextField.getText()),
-                    Double.parseDouble(sellingPriceTextField.getText()),
-                    Integer.parseInt(quantityTextField.getText())
-            );
+            book.setSupplier(supplier);
             book.saveImageLocally(selectedImageFile);
-            book.saveToDatabase();
-
+            book.updateInDatabase();
             return book;
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return null;
         }
     }
-
-    public Book getAddedBook() {
-        return book;
-    }
 }
-
-
-

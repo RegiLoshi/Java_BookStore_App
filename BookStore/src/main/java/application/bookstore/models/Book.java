@@ -23,7 +23,8 @@ import java.sql.SQLException;
 
 
 public class Book  implements DatabaseConnector {
-  private int supplierid = 1;
+  private int supplierid;
+  private boolean exists = false;
   private String ISBN, title, author, category, description;
   private SimpleObjectProperty<ImageView> bookImageProperty = new SimpleObjectProperty<>();
   private Date purchaseDate;
@@ -41,7 +42,7 @@ public class Book  implements DatabaseConnector {
     this.title = name;
     this.author = author;
     this.category = category;
-    supplier = Supplier.getSupplierDB(supplierid);
+    this.supplierid = supplierid;
     this.description = description;
     setBookImageProperty(image);
     this.originalPrice = originalPrice;
@@ -91,6 +92,17 @@ public class Book  implements DatabaseConnector {
     this.sellingPrice = sellingPrice;
     this.quantity = quantity;
   }
+  public Book(String ISBN, String title, String author, String cat, int supplierid ,  String desc, double originalPrice, double sellingPrice, int quantity) {
+    this.ISBN = ISBN;
+    this.title = title;
+    this.author = author;
+    this.category = cat;
+    this.supplierid = supplierid;
+    this.description = desc;
+    this.originalPrice = originalPrice;
+    this.sellingPrice = sellingPrice;
+    this.quantity = quantity;
+  }
 
   public String getISBN() {
     return ISBN;
@@ -130,6 +142,21 @@ public class Book  implements DatabaseConnector {
 
   public void setSupplier(Supplier supplier) {
     this.supplier = supplier;
+  }
+
+  public void setSupplierId(Supplier supplier) {
+    supplierid = supplier.getSupplierId();
+    try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
+      String updateSql = "UPDATE Book SET supplierId = ? WHERE ISBN = ?";
+
+      try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+        updateStatement.setInt(1, supplier.getSupplierId());
+        updateStatement.setString(2, this.ISBN);
+        updateStatement.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   public String getDescription() {
@@ -263,13 +290,41 @@ public class Book  implements DatabaseConnector {
         preparedStatement.setString(2, title);
         preparedStatement.setString(3, author);
         preparedStatement.setString(4, category);
-        preparedStatement.setInt(5, 1);
+        preparedStatement.setInt(5, supplierid);
         preparedStatement.setString(6, description);
         preparedStatement.setString(7, imageUrl);
         preparedStatement.setDouble(8, originalPrice);
         preparedStatement.setDouble(9, sellingPrice);
         preparedStatement.setInt(10, quantity);
         preparedStatement.executeUpdate();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+  public void updateInDatabase() {
+    try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
+      String sql = "UPDATE Book SET name = ?, author = ?, category = ?,  " +
+              "description = ?, bookURL = ?, original_price = ?, selling_price = ?, quantity = ? " +
+              "WHERE ISBN = ?";
+
+      try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        preparedStatement.setString(1, title);
+        preparedStatement.setString(2, author);
+        preparedStatement.setString(3, category);
+        preparedStatement.setString(4, description);
+        preparedStatement.setString(5, imageUrl);
+        preparedStatement.setDouble(6, originalPrice);
+        preparedStatement.setDouble(7, sellingPrice);
+        preparedStatement.setInt(8, quantity);
+        preparedStatement.setString(9, ISBN);
+
+        int rowsAffected = preparedStatement.executeUpdate();
+        if (rowsAffected == 0) {
+          System.out.println("No book with ISBN " + ISBN + " found for update.");
+        } else {
+          System.out.println("Book with ISBN " + ISBN + " updated successfully.");
+        }
       }
     } catch (SQLException e) {
       e.printStackTrace();
