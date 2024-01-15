@@ -232,8 +232,6 @@ public class UsersTableView extends VBox implements DatabaseConnector{
             preparedStatement.setString(6,user.getGender());
             preparedStatement.setString(7,user.getRoleString());
 
-
-
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Did not sign in to DB");
@@ -255,12 +253,10 @@ public class UsersTableView extends VBox implements DatabaseConnector{
             System.out.println("Did not sign in to DB");
             ex.printStackTrace();
         }
-
     }
     public void removeRow(int row)
     {
         tableView.getItems().remove(row);
-
     }
 
 }

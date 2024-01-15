@@ -80,11 +80,6 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
                 return true;
             }
         });
-        /*
-        getDialogPane().expandableContentProperty().set(new Label("This is the expandable ontent area"));
-        getDialogPane().setExpanded(true);
-
-         */
     }
 
     private void setPropertyBindings() {

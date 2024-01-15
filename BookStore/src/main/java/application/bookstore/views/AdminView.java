@@ -65,10 +65,10 @@ public class AdminView {
 
 
 		profile_button.setOnAction(e -> {
-			Stage popup = new Stage();
-			ProfileView profileView = new ProfileView(user);
-			popup.setScene(profileView.showView(popup));
-			popup.show();
+			//Stage popup = new Stage();
+			//ProfileView profileView = new ProfileView(user);
+			//popup.setScene(profileView.showView(popup));
+			//popup.show();
 		});
 
 
@@ -81,6 +81,7 @@ public class AdminView {
 		bookstore_button.setPrefHeight(120);
 		bookstore_button.setPrefWidth(150);
 		bookstore_button.setBackground(null);
+
 		bookstore_button.setOnAction( e -> {
 			BookView bookview = new BookView(user.getRole());
 			stage.setScene(bookview.showView(stage));
