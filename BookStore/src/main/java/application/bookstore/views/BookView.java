@@ -1,13 +1,12 @@
 package application.bookstore.views;
 
 import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.controllers.BookController;
 import application.bookstore.controllers.BookList;
 import application.bookstore.models.Book;
-import application.bookstore.models.Role;
-import javafx.beans.binding.Bindings;
+import application.bookstore.models.User;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,9 +36,14 @@ public class BookView implements DatabaseConnector {
     private TextField search_field;
     private HBox hbox;
     private Label totalSumLabel;
+    private ChoiceBox<Integer> choiceBox;
+    private User user;
+    private BookList bookList;
+    private ArrayList<Book> books;
 
-    public BookView(StringProperty role) {
+    public BookView(StringProperty role ,User user) {
         this.role = role;
+        this.user = user;
     }
 
     public Scene showView(Stage stage) {
@@ -60,6 +64,52 @@ public class BookView implements DatabaseConnector {
 
         TableView<Book> tableView = new TableView<>();
         TableView<Book> buying_tableView = new TableView<>();
+        tableView.setRowFactory(tv -> {
+            TableRow<Book> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Book selectedBook = row.getItem();
+
+                    Stage actionStage = new Stage();
+                    HBox actionBox = new HBox();
+                    Scene actionScene = new Scene(actionBox, 200, 100);
+
+                    Button editButton = new Button("Edit Book");
+                    editButton.setMinWidth(30);
+                    editButton.setMinHeight(30);
+                    Button deleteButton = new Button("Delete Book");
+                    deleteButton.setMinWidth(30);
+                    deleteButton.setMinHeight(30);
+
+                    editButton.setOnAction(e -> {
+                        EditBookView editBookView = new EditBookView(selectedBook);
+                        try {
+                            Stage editStage = new Stage();
+                            editStage.setScene(editBookView.showView(editStage));
+                            editStage.show();
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        actionStage.close();
+                    });
+
+                    deleteButton.setOnAction(e -> {
+                        BookController.deleteBook(selectedBook.getISBN());
+                        tableView.getItems().remove(selectedBook);
+                        actionStage.close();
+                    });
+
+                    actionBox.setAlignment(Pos.CENTER);
+                    actionBox.setSpacing(10);
+                    actionBox.getChildren().addAll(editButton, deleteButton);
+
+                    actionStage.setScene(actionScene);
+                    actionStage.show();
+                }
+            });
+            return row;
+        });
+
 
         TableColumn<Book, Long> isbnCol = new TableColumn<>("ISBN");
         isbnCol.setCellValueFactory(
@@ -77,7 +127,7 @@ public class BookView implements DatabaseConnector {
                 new PropertyValueFactory<>("title"));
         titleCol.setMinWidth(115);
         titleCol.setCellFactory(col -> {
-            TableCell<Book, String> cell = new TableCell<Book, String>() {
+            return new TableCell<Book, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -91,7 +141,6 @@ public class BookView implements DatabaseConnector {
                     }
                 }
             };
-            return cell;
         });
 
         TableColumn<Book, String> buyTitleCol = new TableColumn<>("Title");
@@ -202,7 +251,9 @@ public class BookView implements DatabaseConnector {
                         selectedBooks.add(chosen_book);
                     } else {
                         selectedBooks.remove(chosen_book);
+                        updateTotalSumLabel();
                     }
+                    buying_tableView.refresh();
                 });
                 return new SimpleObjectProperty<>(checkBox);
             }
@@ -235,6 +286,7 @@ public class BookView implements DatabaseConnector {
                 checkBox.selectedProperty().addListener((ov, old_val, new_val) -> {
                     if (!new_val){
                         selectedBooks.remove(chosen_book);
+                        choiceBox.setValue(0);
                     }
                 });
                 return new SimpleObjectProperty<CheckBox>(checkBox);
@@ -262,12 +314,12 @@ public class BookView implements DatabaseConnector {
             choiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
                 book.setChosenQuantity(newVal);
                 updateTotalSumLabel();
-                totalPriceCol.getTableView().refresh();
             });
 
             return new SimpleObjectProperty<>(choiceBox);
         });
         buyQuantityCol.setMinWidth(115);
+
 
 
         buying_tableView.getColumns().addAll(buyselectCol , buyQuantityCol , sellingPrice_col,totalPriceCol, buyIsbnCol , buyTitleCol , buyAuthorCol
@@ -279,8 +331,8 @@ public class BookView implements DatabaseConnector {
         tableView.getColumns().addAll(selectCol , isbnCol , titleCol , authorCol ,
                 categoryCol , descriptionCol , imageCol  , quantityCol);
 
-        BookList bookList = new BookList();
-        ArrayList <Book> books = bookList.getBooks();
+        bookList = new BookList();
+        books = bookList.getBooks();
         tableView.getItems().addAll(books);
 
         VBox tables = new VBox();
@@ -292,10 +344,51 @@ public class BookView implements DatabaseConnector {
         Button generateBill = new Button("Generate Bill");
         generateBill.setMinWidth(50);
         generateBill.setMinHeight(50);
+        generateBill.setOnAction( e->{
+            BookController.generateBill(user , selectedBooks , calculateTotalSum() );
+            for (Book selectedBook : selectedBooks) {
+                int newQuantity = selectedBook.getQuantity() - selectedBook.getChosenQuantity();
+                selectedBook.setQuantity(newQuantity);
+            }
+            selectedBooks.clear();
+            tableView.refresh();
+            buying_tableView.refresh();
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText("Successfully Generated Bill");
+            alert.show();
+        });
         totalSumLabel = new Label("Total amount ");
         totalSumLabel.setStyle("-fx-font-size: 20px;");
 
-        hbox_bottom.getChildren().addAll(totalSumLabel , generateBill);
+        Button clearAllButton = new Button("Clear");
+        clearAllButton.setMinWidth(50);
+        clearAllButton.setMinHeight(50);
+        clearAllButton.setOnAction(event -> {
+            selectedBooks.clear();
+            tableView.refresh();
+            buying_tableView.refresh();
+            updateTotalSumLabel();
+        });
+
+        if(!(role.toString().equalsIgnoreCase("librarian"))){
+            Button addBook = new Button("Add Book");
+            addBook.setOnAction(event -> {
+                Stage popup = new Stage();
+                AddBookView addBookView = new AddBookView();
+                try {
+                    popup.setScene(addBookView.showView(popup));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                popup.show();
+            });
+            addBook.setMinWidth(50);
+            addBook.setMinHeight(50);
+            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton , addBook );
+        }else{
+            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton);
+        }
         hbox_bottom.setAlignment(Pos.CENTER);
         hbox_bottom.setSpacing(30);
         hbox_bottom.setMinWidth(150);
@@ -330,7 +423,7 @@ public class BookView implements DatabaseConnector {
     private double calculateTotalSum() {
         double totalSum = 0.0;
         for (Book book : selectedBooks) {
-            double originalPrice = book.getSellingPrice(); // Replace with the actual property
+            double originalPrice = book.getSellingPrice();
             int chosenQuantity = book.getChosenQuantity();
             totalSum += originalPrice * chosenQuantity;
         }
@@ -340,5 +433,4 @@ public class BookView implements DatabaseConnector {
         double totalSum = calculateTotalSum();
         totalSumLabel.setText("Total Sum: " + String.format("%.2f", totalSum));
     }
-
 }
