@@ -1,0 +1,6 @@
+Sold by: admin admin Role: admin
+
+Books:
+- T (Chosen Quantity: 18): $55.0T - $55.0
+
+Total Amount: $990.0
