@@ -1,6 +1,7 @@
 package application.bookstore.views;
 import java.io.FileInputStream;
 
+import application.bookstore.charts.Chart1;
 import application.bookstore.models.User;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -96,8 +97,8 @@ public class AdminView {
 		});
 
 		statistics_button.setOnAction(e-> {
-			StatisticsView statisticsView=new StatisticsView(user);
-			stage.setScene(statisticsView.showView(stage));
+			Chart1 chart1=new Chart1(user);
+			stage.setScene(chart1.showView(stage));
 				}
 		);
 

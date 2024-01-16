@@ -253,6 +253,11 @@ public class BookView implements DatabaseConnector {
         TableColumn<Book ,CheckBox> buyselectCol = new TableColumn<>("");
         FileInputStream file2 = null;
         try {
+            String os = System.getProperty("os.name").toLowerCase();
+            if(os.contains("win"))
+            {
+                file2 = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\Images\\touch.png");
+            }else
             file2 = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
