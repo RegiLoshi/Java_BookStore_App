@@ -14,7 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class AdminView {
+public class AdminView extends AbstractAdminView{
 	private User user;
 	private ImageView[] buttonImages = new ImageView[5];
 	private BorderPane frame;
@@ -156,7 +156,7 @@ public class AdminView {
 		return new Scene(frame , 1000 , 720 );
 	}
 
-	private void getButtonImages() {
+	protected void getButtonImages() {
 		/*image is a fileinputstream which is used to get the png files into the code,
 		 then we use that to create a imageview and store it into buttonImages array of imageviews which is latter used to get the icons for buttons
 		 */

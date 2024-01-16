@@ -2,6 +2,7 @@ package application.bookstore.views;
 
 import application.bookstore.auxiliaries.Alerts;
 import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.charts.Chart1;
 import application.bookstore.controllers.BookController;
 import application.bookstore.controllers.BookList;
 import application.bookstore.controllers.FilterController;
@@ -426,6 +427,10 @@ public class BookView implements DatabaseConnector {
                 Button statistic = new Button("Statistic");
                 statistic.setMinWidth(50);
                 statistic.setMinHeight(50);
+                statistic.setOnAction(event -> {
+                            Chart1 chart1 = new Chart1(user);
+                            stage.setScene(chart1.showView(stage));
+                        });
                 hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic );
             }
         }else{

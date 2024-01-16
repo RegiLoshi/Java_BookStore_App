@@ -3,6 +3,7 @@ package application.bookstore.charts;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.models.User;
 import application.bookstore.views.AdminView;
+import application.bookstore.views.BookView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -93,11 +94,14 @@ public class Chart1 implements DatabaseConnector {
                 } catch (Exception ex) {
                     System.out.println("Problem when accessing adminView");
                 }
-            }else
-            {
-                //
-            }
-        });
+            }else {
+                BookView bookView = new BookView(currentUser.getRole(), currentUser);
+                try {
+                    primaryStage.setScene(bookView.showView(primaryStage));
+                } catch (Exception ex) {
+                    System.out.println("Problem when accessing BookStore");
+                }
+            }});
 
         return new Scene(root, 1000, 700);
     }

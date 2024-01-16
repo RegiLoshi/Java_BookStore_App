@@ -1,5 +1,6 @@
 package application.bookstore.charts;
 
+import application.bookstore.views.BookView;
 import javafx.scene.Scene;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.models.User;
@@ -94,11 +95,14 @@ public class Chart3 implements DatabaseConnector{
                 } catch (Exception ex) {
                     System.out.println("Problem when accessing adminView");
                 }
-            }else
-            {
-                //
-            }
-        });
+            }else {
+                BookView bookView = new BookView(currentUser.getRole(), currentUser);
+                try {
+                    primaryStage.setScene(bookView.showView(primaryStage));
+                } catch (Exception ex) {
+                    System.out.println("Problem when accessing BookStore");
+                }
+            }});
 
         root.setTop(leaveButton);
         BorderPane.setAlignment(leaveButton, Pos.TOP_LEFT);
