@@ -260,5 +260,49 @@ public class UsersTableView extends VBox implements DatabaseConnector {
         tableView.getItems().remove(row);
     }
 
+    public TableColumn<User, String> getFirstNameColumn()
+    {
+        return firstNameColumn;
+    }
+
+    public TableView<User> getTableView() {
+        return tableView;
+    }
+
+    public TableColumn<User, String> getLastNameColumn() {
+        return lastNameColumn;
+    }
+
+    public TableColumn<User, String> getEmailColumn() {
+        return emailColumn;
+    }
+
+    public TableColumn<User, String> getUserNameColumn() {
+        return userNameColumn;
+    }
+
+    public TableColumn<User, String> getPasswordColumn() {
+        return passwordColumn;
+    }
+
+    public TableColumn<User, String> getGenderColumn() {
+        return genderColumn;
+    }
+
+    public TableColumn<User, String> getRoleColumn() {
+        return roleColumn;
+    }
+
+    public Button getAddButton() {
+        return addButton;
+    }
+
+    public Button getRemoveButton() {
+        return removeButton;
+    }
+
+    public ObservableList<User> getUsers() {
+        return users;
+    }
 }
 
