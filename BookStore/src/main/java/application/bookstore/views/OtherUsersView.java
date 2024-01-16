@@ -5,6 +5,7 @@ import application.bookstore.models.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -64,6 +65,32 @@ public class OtherUsersView implements DatabaseConnector {
         usersTableView=new UsersTableView(users);
 
         borderPane.setTop(usersTableView);
+
+        Button backButton=new Button("Back");
+
+        backButton.setPrefWidth(100);
+        backButton.setPadding(new Insets(20,20,20,20));
+        // Apply styles using CSS
+        backButton.setStyle(
+                "-fx-background-color: red; " + // Background color
+                        "-fx-text-fill: white; " +          // Text color
+                        "-fx-font-size: 20px; "            // Font size
+        );
+
+        borderPane.setBottom(backButton);
+
+        // Set action for the button (you can replace this with your own action)
+        backButton.setOnAction(event -> {
+            // Add your back button action here
+            AdminView adminView=new AdminView(currentAdmin);
+            try {
+                stage.setScene(adminView.showView(stage));
+            } catch (Exception e) {
+                System.out.println("Error reentering adminView from OtherUsersView");
+                throw new RuntimeException(e);
+            }
+        });
+
 
         Scene scene = new Scene(borderPane, 1000, 700);
 

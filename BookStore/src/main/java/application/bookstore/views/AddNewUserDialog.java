@@ -90,7 +90,7 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
                 else if(!(passF.getText().matches("^(?=.*[A-Za-z])(?=.*[\\d])[A-Za-z\\d]{8,}$")))
                 {
                     Alerts.showAlert(Alert.AlertType.ERROR,"Error in password","The password must contain " +
-                            "a minimum of eight characters, at least one letter and one number and no other characters.");
+                            "a minimum of eight characters, at least one letter and one number and no special characters.");
                     return false;
                 }
                 return true;
