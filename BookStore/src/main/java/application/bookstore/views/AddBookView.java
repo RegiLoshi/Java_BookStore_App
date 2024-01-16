@@ -1,10 +1,12 @@
 package application.bookstore.views;
 
+import application.bookstore.auxiliaries.Alerts;
 import application.bookstore.models.Book;
 import application.bookstore.models.Supplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,6 +23,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AddBookView {
     private GridPane pane;
@@ -60,6 +64,10 @@ public class AddBookView {
     private File selectedImageFile;
     private Label image_label;
     private Book book;
+    private static final String ISBN_PATTERN = "\\d{13}";
+    private static final String EMAIL_PATTERN = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+    private static final String PHONE_PATTERN = "\\d{10}";
+
 
     public Scene showView(Stage stage) throws Exception {
         mainpane = new BorderPane();
@@ -152,6 +160,9 @@ public class AddBookView {
         chooseImageButton.setMinWidth(150);
         chooseImageButton.setOnAction(e -> chooseImage());
 
+        //inout validation
+
+
 
         pane.addRow(0, isbnLabel, isbnTextField);
         pane.addRow(1, titleLabel, titleTextField);
@@ -185,18 +196,29 @@ public class AddBookView {
     }
     public Book createBook() {
         try {
+            if (!validateISBN(isbnTextField.getText())) {
+                Alerts.showAlert(Alert.AlertType.ERROR , "Invalid ISBN" , "Please enter a valid ISBN");
+                return null;
+            }
+
+            if (!validateEmail(supplierEmailTextField.getText())) {
+                Alerts.showAlert(Alert.AlertType.ERROR , "Invalid Supplier Email" , "Please enter a valid Supplier Email");
+                return null;
+            }
+
+            if (!validatePhoneNumber(supplierPhoneTextField.getText())) {
+                Alerts.showAlert(Alert.AlertType.ERROR , "Invalid Supplier Phone Number" , "Please enter a valid Phone Number");
+                return null;
+            }
+
             Supplier supplier = new Supplier(supplierNameTextField.getText() , supplierEmailTextField.getText() ,
                     supplierPhoneLabel.getText() , supplierAddressTextField.getText());
-            supplier.findSupplierId();
-            if(!(supplier.supplierExists(supplier.getSupplierId()))) {
-                supplier.saveToDatabase();
-            }
             book = new Book(
                     isbnTextField.getText(),
                     titleTextField.getText(),
                     authorTextField.getText(),
                     categoryTextField.getText(),
-                    supplier.getSupplierId(),
+                    supplier.findSupplierId(),
                     descriptionTextField.getText(),
                     Double.parseDouble(originalPriceTextField.getText()),
                     Double.parseDouble(sellingPriceTextField.getText()),
@@ -214,6 +236,24 @@ public class AddBookView {
 
     public Book getAddedBook() {
         return book;
+    }
+
+    private boolean validateISBN(String isbn) {
+        Pattern pattern = Pattern.compile(ISBN_PATTERN);
+        Matcher matcher = pattern.matcher(isbn);
+        return matcher.matches();
+    }
+
+    private boolean validateEmail(String email) {
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
+    private boolean validatePhoneNumber(String phone) {
+        Pattern pattern = Pattern.compile(PHONE_PATTERN);
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
     }
 }
 

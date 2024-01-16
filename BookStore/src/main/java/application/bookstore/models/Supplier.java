@@ -3,7 +3,6 @@ package application.bookstore.models;
 import application.bookstore.auxiliaries.DatabaseConnector;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 public class Supplier implements DatabaseConnector {
     private int supplierId;
@@ -70,7 +69,7 @@ public class Supplier implements DatabaseConnector {
 
 
 
-    public void saveToDatabase() {
+    public int saveToDatabase() {
         try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
             String insertSql = "INSERT INTO Supplier (name, email, phoneNumber, address) VALUES (?, ?, ?, ?)";
             String selectSql = "SELECT SupplierId FROM Supplier WHERE email = ?";
@@ -83,6 +82,7 @@ public class Supplier implements DatabaseConnector {
                 try (ResultSet generatedKeys = insertStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         this.supplierId = generatedKeys.getInt(1);
+                        return supplierId;
                     } else {
                         throw new SQLException("Failed to retrieve SupplierId.");
                     }
@@ -91,23 +91,25 @@ public class Supplier implements DatabaseConnector {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return 0;
     }
 
-    public void findSupplierId() {
+    public int findSupplierId() {
         try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
             String selectSql = "SELECT * FROM Supplier WHERE email = ?";
             try (PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
                 selectStatement.setString(1, this.email);
                 ResultSet resultSet = selectStatement.executeQuery();
                 if (resultSet.next()) {
-                    int supplierId = resultSet.getInt("SupplierId");
+                    this.supplierId = resultSet.getInt("SupplierId");
                 } else {
-                    this.saveToDatabase();
+                    this.supplierId = this.saveToDatabase();
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return this.supplierId;
     }
 
     public void setSupplierId(int id) {

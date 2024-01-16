@@ -47,17 +47,6 @@ public class AdminView {
 		options.setPrefWidth(200);
 		options.setSpacing(30);
 
-		/*
-		Vbox pane created so we can store buttons for scene changing depending on where the admin wants to go.
-		Button1 with image
-		|
-		|
-		|
-		|
-		|
-		Button2 with image and so on
-		 */
-
 		profile_button = new Button("",buttonImages[0]);
 		profile_button.setPrefHeight(120);
 		profile_button.setPrefWidth(150);
@@ -65,10 +54,10 @@ public class AdminView {
 
 
 		profile_button.setOnAction(e -> {
-			//Stage popup = new Stage();
-			//ProfileView profileView = new ProfileView(user);
-			//popup.setScene(profileView.showView(popup));
-			//popup.show();
+			Stage popup = new Stage();
+			ProfileView profileView = new ProfileView(user);
+			popup.setScene(profileView.showView(popup));
+			popup.show();
 		});
 
 

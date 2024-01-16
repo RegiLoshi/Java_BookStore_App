@@ -8,10 +8,7 @@ import javafx.collections.ObservableList;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -71,4 +68,39 @@ public class BookController implements DatabaseConnector {
             e.printStackTrace();
         }
     }
+
+    public static void generateBillToDatabase(ObservableList<Book> selectedBooks, double amount, User user) {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+            LocalDateTime timestamp = LocalDateTime.now();
+
+            String createSQL = "INSERT INTO Bill (date, username, total_amount) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(createSQL, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setObject(1, timestamp);
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setDouble(3, amount);
+            preparedStatement.executeUpdate();
+
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            int orderId;
+            if (generatedKeys.next()) {
+                orderId = generatedKeys.getInt(1);
+            } else {
+                throw new SQLException("Failed to retrieve auto-generated keys.");
+            }
+
+            for (Book book : selectedBooks) {
+                String createeSQL = "INSERT INTO SoldBookType (ISBN, amount, soldQuantity, orderId) VALUES (?, ?, ?, ?)";
+                PreparedStatement preparedStatementt = connection.prepareStatement(createeSQL);
+                preparedStatementt.setString(1, book.getISBN());
+                preparedStatementt.setDouble(2, book.getSellingPrice());
+                preparedStatementt.setInt(3, book.getChosenQuantity());
+                preparedStatementt.setInt(4, orderId);
+                preparedStatementt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
+
