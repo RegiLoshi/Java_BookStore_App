@@ -189,7 +189,7 @@ public class UsersTableController implements DatabaseConnector {
         }
 
         //adding user to database
-        String query="INSERT INTO User (firstName, lastName, email, userName, password, gender, Role) VALUES" +
+        String query="INSERT INTO user (firstName, lastName, email, userName, password, gender, Role) VALUES" +
                 "(?,?,?,?,?,?,?);";
         try {
             Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
@@ -204,7 +204,7 @@ public class UsersTableController implements DatabaseConnector {
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            System.out.println("Did not sign in to DB");
+            System.out.println("Problem when adding user");
             ex.printStackTrace();
         }
 

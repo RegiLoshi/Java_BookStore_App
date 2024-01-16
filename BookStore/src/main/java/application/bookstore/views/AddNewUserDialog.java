@@ -1,7 +1,11 @@
 package application.bookstore.views;
 
+import application.bookstore.Exceptions.EmailAlreadyExistsException;
+import application.bookstore.Exceptions.PasswordAlreadyExistsException;
+import application.bookstore.Exceptions.UsernameAlreadyExistsException;
 import application.bookstore.auxiliaries.Alerts;
 import application.bookstore.auxiliaries.DatabaseConnector;
+import application.bookstore.controllers.AddNewUserController;
 import application.bookstore.models.User;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -47,7 +51,6 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
     private ToggleGroup roleToggleGroup;
 
     public AddNewUserDialog(User user) {
-        super();
         this.setTitle("Add User");
         this.user = user;
         buildUI();
@@ -92,7 +95,30 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
                     Alerts.showAlert(Alert.AlertType.ERROR,"Error in password","The password must contain " +
                             "a minimum of eight characters, at least one letter and one number and no special characters.");
                     return false;
+
                 }
+                else if(!(passF.getText().equals(VpassF.getText()))) {
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Error in password","Password and Verify Password fields do not match");
+                    return false;
+                }
+
+                try
+                {
+                    AddNewUserController.allValuesUnique(getUsername(),getEmail(),getPassword());
+                }catch (UsernameAlreadyExistsException e)
+                {
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Username exists","The entered username already exists");
+                    return false;
+                }catch (EmailAlreadyExistsException ex)
+                {
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Email exists","The entered email already exists");
+                    return false;
+                }catch (PasswordAlreadyExistsException exe)
+                {
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Password exists","The entered password already exists");
+                    return false;
+                }
+
                 return true;
             }
         });
@@ -222,6 +248,19 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
         gridPane.add(roleButtons,1,7);
 
         return gridPane;
+    }
+
+    public String getUsername()
+    {
+        return UsernameField.getText();
+    }
+    public String getEmail()
+    {
+        return this.EmailField.getText();
+    }
+    public String getPassword()
+    {
+        return this.passF.getText();
     }
 
 }
