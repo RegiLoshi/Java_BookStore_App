@@ -11,15 +11,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class AdminView {
 	private User user;
 	private ImageView[] buttonImages = new ImageView[5];
 	private BorderPane frame;
-	private VBox options;
+	private VBox top;
 	private Scene scene;
 	private Button profile_button;
 	private Button other_users_buttons;
@@ -31,6 +30,9 @@ public class AdminView {
 	private Alert alert;
 	private VBox center;
 	private Label welcome_user;
+	private HBox options_1;
+	private HBox options_2;
+	private VBox options_3;
 
 	public AdminView(User user){
 		this.user = user;
@@ -38,15 +40,34 @@ public class AdminView {
 	public Scene showView(Stage stage) throws Exception {
 
 		frame = new BorderPane(); // Main Frame that will hold every component and pane
-		frame.setStyle("-fx-background-color: #FFF9E9;");
+		//frame.setStyle("-fx-background-color: #FFF9E9;");
+		Image backgroundImage = new Image("file:/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/3d-render-wooden-table-looking-out-blurred-background-with-bookcase.jpg");
+
+		BackgroundSize backgroundSize = new BackgroundSize(
+				1000,  // Width of the scene
+				720,   // Height of the scene
+				false, // Width is percentage
+				false, // Height is percentage
+				false, // Width contains aspect ratio
+				false  // Height contains aspect ratio
+		);
+
+		BackgroundImage background = new BackgroundImage(
+				backgroundImage,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundPosition.DEFAULT,
+				backgroundSize
+		);
+
+		frame.setBackground(new Background(background));
 
 		getButtonImages();//call function that will get the images required for the side options
 
 
-		options = new VBox();
-		options.setStyle("-fx-background-color: #D2B48C;");
-		options.setPrefWidth(200);
-		options.setSpacing(30);
+		options_1 = new HBox();
+		options_2 = new HBox();
+		options_3 = new VBox();
 
 		profile_button = new Button("",buttonImages[0]);
 		profile_button.setPrefHeight(120);
@@ -86,9 +107,16 @@ public class AdminView {
 		log_out_button.setPrefHeight(120);
 		log_out_button.setPrefWidth(150);
 		log_out_button.setBackground(null);
+		log_out_button.setOnAction(event -> {
+			LoginView loginView = new LoginView();
+			stage.setScene(loginView.showView(stage));
+		});
 
-		options.getChildren().addAll(profile_button, other_users_buttons , bookstore_button , statistics_button , log_out_button);
-		options.setAlignment(Pos.CENTER);
+		options_1.getChildren().addAll(profile_button, other_users_buttons , bookstore_button);
+		options_2.getChildren().addAll(statistics_button , log_out_button);
+		options_2.setSpacing(20);
+		options_3.getChildren().addAll(options_1 , options_2);
+		options_3.setAlignment(Pos.CENTER);
 
 		//event handlers for the buttons
 		other_users_buttons.setOnAction(e->{
@@ -102,25 +130,30 @@ public class AdminView {
 				}
 		);
 
-		center = new VBox();
-
 		welcome_user = new Label("Welcome " + user.getFirstName() + " " + user.getLastName()); 												//!!!!!!!!!!!! Replace with the class.getUsername(); to make it Dynamic depending on which users logs in
 		welcome_user.setStyle(
-				"-fx-font-size: 40px;" + // Set font size to 24 pixels							//!!!!!!! Not Finished yet the style will be changed to match background and look better
+				"-fx-font-size: 80px;" + // Set font size to 24 pixels							//!!!!!!! Not Finished yet the style will be changed to match background and look better
 						"-fx-font-family: 'Arial';" + // Set font family to Arial
-						"-fx-text-fill: black;" // Set text color to white
+						"-fx-text-fill: white;" // Set text color to white
 		);
-
-		center.getChildren().add(welcome_user);
-		center.setAlignment(Pos.TOP_CENTER);
-
-		frame.setLeft(options);
-		frame.setCenter(center);
+		;
+		frame.setAlignment(welcome_user, Pos.CENTER);
+		frame.setAlignment(options_3, Pos.CENTER);
+		options_1.setAlignment(Pos.CENTER);
+		options_2.setAlignment(Pos.CENTER);
+		double buttonSize = 150.0;
+		for (Button button : new Button[]{profile_button, other_users_buttons, bookstore_button, statistics_button, log_out_button}) {
+			button.setPrefHeight(buttonSize);
+			button.setPrefWidth(buttonSize);
+			button.setBackground(null);
+		}
+		frame.setTop(welcome_user);
+		frame.setCenter(options_3);
 
 		// create scene
 
 		stage.setTitle("Admin Window");
-		return new Scene(frame , 1000 , 700 );
+		return new Scene(frame , 1000 , 720 );
 	}
 
 	private void getButtonImages() {
@@ -183,35 +216,35 @@ public class AdminView {
 				try {
 					switch(i) {
 						case 0:
-							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/profile_icon.png");
+							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/user-3.png");
 							img = new Image(image);
 							buttonImages[0] = new ImageView(img);
 							buttonImages[0].setFitHeight(100);
 							buttonImages[0].setFitWidth(100);
 							break;
 						case 1:
-							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/other_users.png");
+							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/group-3.png");
 							img = new Image(image);
 							buttonImages[1] = new ImageView(img);
 							buttonImages[1].setFitHeight(100);
 							buttonImages[1].setFitWidth(100);
 							break;
 						case 2:
-							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/book.png");
+							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/book-3.png");
 							img = new Image(image);
 							buttonImages[2] = new ImageView(img);
 							buttonImages[2].setFitHeight(120);
 							buttonImages[2].setFitWidth(120);
 							break;
 						case 3:
-							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/statistics.png");
+							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/trend.png");
 							img = new Image(image);
 							buttonImages[3] = new ImageView(img);
 							buttonImages[3].setFitHeight(140);
 							buttonImages[3].setFitWidth(140);
 							break;
 						case 4:
-							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/log_out.png");
+							image = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/power.png");
 							img = new Image(image);
 							buttonImages[4] = new ImageView(img);
 							buttonImages[4].setFitHeight(100);

@@ -72,8 +72,6 @@ public class OtherUsersView implements DatabaseConnector {
         backButton.setPadding(new Insets(20,20,20,20));
         // Apply styles using CSS
         backButton.setStyle(
-                "-fx-background-color: red; " + // Background color
-                        "-fx-text-fill: white; " +          // Text color
                         "-fx-font-size: 20px; "            // Font size
         );
 

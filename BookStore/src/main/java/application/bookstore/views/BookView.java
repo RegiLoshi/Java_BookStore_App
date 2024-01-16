@@ -19,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -342,6 +343,13 @@ public class BookView implements DatabaseConnector {
             String selectedCategory = filterComboBox.getValue();
             filterTable(selectedCategory, searchText);
         });
+        search_button.setOnKeyPressed(e -> {
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                        String searchText = search_field.getText();
+                        String selectedCategory = filterComboBox.getValue();
+                        filterTable(selectedCategory, searchText);
+                    }
+                });
         filterComboBox.setOnAction(event -> filterTable(filterComboBox.getValue(), search_field.getText()));
         hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
@@ -386,7 +394,19 @@ public class BookView implements DatabaseConnector {
             updateTotalSumLabel();
         });
 
-        if(!(role.toString().equalsIgnoreCase("librarian"))){
+        Button goBackButton = new Button("Go Back");
+        goBackButton.setMinWidth(50);
+        goBackButton.setMinHeight(50);
+        goBackButton.setOnAction(event -> {
+            AdminView adminView = new AdminView(user);
+            try {
+                stage.setScene(adminView.showView(stage));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        if(!(user.getRoleString().equalsIgnoreCase("librarian"))){
             Button addBook = new Button("Add Book");
             addBook.setOnAction(event -> {
                 Stage popup = new Stage();
@@ -400,16 +420,16 @@ public class BookView implements DatabaseConnector {
             });
             addBook.setMinWidth(50);
             addBook.setMinHeight(50);
-            if(role.toString().equalsIgnoreCase("admin")) {
-                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook);
+            if(user.getRoleString().equalsIgnoreCase("admin")) {
+                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , goBackButton);
             }else{
                 Button statistic = new Button("Statistic");
                 statistic.setMinWidth(50);
                 statistic.setMinHeight(50);
-                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic);
+                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic );
             }
         }else{
-            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton);
+            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton );
         }
         hbox_bottom.setAlignment(Pos.CENTER);
         hbox_bottom.setSpacing(30);
@@ -417,6 +437,7 @@ public class BookView implements DatabaseConnector {
         hbox_bottom.setMinHeight(150);
 
         pane.setCenter(tables);
+        pane.setFocusTraversable(true);
         pane.setTop(hbox);
         pane.setBottom(hbox_bottom);
         stage.setTitle("Books");

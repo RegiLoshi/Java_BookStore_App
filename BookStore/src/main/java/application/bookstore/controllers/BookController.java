@@ -93,7 +93,7 @@ public class BookController implements DatabaseConnector {
                 String createeSQL = "INSERT INTO SoldBookType (ISBN, amount, soldQuantity, orderId) VALUES (?, ?, ?, ?)";
                 PreparedStatement preparedStatementt = connection.prepareStatement(createeSQL);
                 preparedStatementt.setString(1, book.getISBN());
-                preparedStatementt.setDouble(2, book.getSellingPrice());
+                preparedStatementt.setDouble(2, (book.getSellingPrice() - book.getOriginalPrice()));
                 preparedStatementt.setInt(3, book.getChosenQuantity());
                 preparedStatementt.setInt(4, orderId);
                 preparedStatementt.executeUpdate();

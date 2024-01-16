@@ -14,12 +14,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 
 public class LoginView implements DatabaseConnector {
@@ -29,7 +32,28 @@ public class LoginView implements DatabaseConnector {
     private PasswordField passwordField;
     public Scene showView(Stage stage)
     {
-        stage.setTitle("JavaFX Login");
+        StackPane root = new StackPane();
+
+        try {
+            FileInputStream logoFile = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/bookStoreLogo2.png");
+            FileInputStream backgroundFile = new FileInputStream("/Users/regiloshi/Downloads/closeup-books-wellorganized-shelves-bookstore.jpg");
+
+            Image logoImage = new Image(logoFile);
+            Image backgroundImage = new Image(backgroundFile);
+
+            ImageView logo = new ImageView(logoImage);
+            ImageView background = new ImageView(backgroundImage);
+
+            // Set the logo position at the top center
+            StackPane.setAlignment(logo, Pos.TOP_CENTER);
+            background.setFitWidth(1000); // Set the width to match the scene width
+            background.setFitHeight(700);
+
+            // Add the background image to the bottom
+            root.getChildren().addAll(background, logo);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         grid=new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(15);
@@ -37,11 +61,13 @@ public class LoginView implements DatabaseConnector {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
         Text welcomeMessage = new Text("Welcome to the Bookstore");
+        welcomeMessage.setFill(javafx.scene.paint.Color.WHITE);
         welcomeMessage.setTextAlignment(TextAlignment.CENTER);
         welcomeMessage.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
         grid.add(welcomeMessage,0,0,2,2);
 
         Label userName = new Label("Username:");
+        userName.setTextFill(javafx.scene.paint.Color.WHITE);
         userName.setFont(Font.font(20));
         grid.add(userName, 0,4 );
 
@@ -49,13 +75,16 @@ public class LoginView implements DatabaseConnector {
         grid.add(userTextField, 1, 4);
 
         Label password_label = new Label("Password:");
+        password_label.setTextFill(javafx.scene.paint.Color.WHITE);
         password_label.setFont(Font.font(20));
         grid.add(password_label, 0, 5);
 
         passwordField = new PasswordField();
         grid.add(passwordField, 1, 5);
 
-         btn = new Button("Log in");
+        btn = new Button("Log in");
+        btn.setStyle("-fx-background-color: #808080;");
+        btn.setTextFill(Color.WHITE);
         btn.setFont(Font.font(20));
         HBox hbtn=new HBox(btn);
         hbtn.setAlignment(Pos.CENTER);
@@ -63,18 +92,21 @@ public class LoginView implements DatabaseConnector {
 
         stage.setTitle("Log in");
 
-        new LoginController(this,stage);
+        root.getChildren().add(grid);
 
-        grid.setStyle(
+        stage.setTitle("Log in");
+
+        new LoginController(this, stage);
+
+        root.setStyle(
                 "-fx-font-family: 'JetBrains Mono'; " +
                         "-fx-font-size: 20px; " +
                         "-fx-font-weight: bold; " +
-                        "-fx-background-color: #FFF9E9; " +
-                "-fx-background-repeat: no-repeat; " +
-                        "-fx-background-size: stretch;"
+                        "-fx-background-repeat: no-repeat; " +
+                        "-fx-background-size: cover;"
         );
 
-        return new Scene(grid,1000,700);
+        return new Scene(root, 1000, 700);
     }
 
 
