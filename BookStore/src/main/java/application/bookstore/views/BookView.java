@@ -29,6 +29,7 @@ import javafx.util.Callback;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 
 public class BookView implements DatabaseConnector {
@@ -62,9 +63,6 @@ public class BookView implements DatabaseConnector {
         search_field.setMinWidth(600);
         search_field.setMinHeight(40);
 
-        search_button = new Button("Search");
-        search_button.setMinWidth(30);
-        search_button.setMinHeight(30);
 
         tableView = new TableView<>();
         TableView<Book> buying_tableView = new TableView<>();
@@ -330,7 +328,16 @@ public class BookView implements DatabaseConnector {
         tables.getChildren().addAll(tableView , buying_tableView);
 
         ComboBox<String> filterComboBox = FilterController.createFilterComboBox(bookList.getCategories());
-        filterComboBox.setOnAction(event -> filterTable(filterComboBox.getValue()));
+
+        search_button = new Button("Search");
+        search_button.setMinWidth(30);
+        search_button.setMinHeight(30);
+        search_button.setOnAction(event -> {
+            String searchText = search_field.getText();
+            String selectedCategory = filterComboBox.getValue();
+            filterTable(selectedCategory, searchText);
+        });
+        filterComboBox.setOnAction(event -> filterTable(filterComboBox.getValue(), search_field.getText()));
         hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(search_label, search_field , search_button , filterComboBox);
@@ -353,6 +360,7 @@ public class BookView implements DatabaseConnector {
                 }
                 selectedBooks.clear();
                 tableView.refresh();
+                totalSumLabel.setText("");
                 buying_tableView.refresh();
 
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -387,7 +395,14 @@ public class BookView implements DatabaseConnector {
             });
             addBook.setMinWidth(50);
             addBook.setMinHeight(50);
-            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton , addBook );
+            if(role.toString().equalsIgnoreCase("admin")) {
+                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook);
+            }else{
+                Button statistic = new Button("Statistic");
+                statistic.setMinWidth(50);
+                statistic.setMinHeight(50);
+                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic);
+            }
         }else{
             hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton);
         }
@@ -403,17 +418,18 @@ public class BookView implements DatabaseConnector {
         return new Scene(pane, 1000 , 700 );
     }
 
-    private void filterTable(String selectedCategory) {
-        if ("All".equals(selectedCategory)) {
-            tableView.setItems(FXCollections.observableArrayList(books));
-        } else {
-            FilteredList<Book> filteredList = new FilteredList<>(FXCollections.observableArrayList(books));
-            filteredList.setPredicate(book -> book.getCategory().equalsIgnoreCase(selectedCategory));
-
-            tableView.setItems(filteredList);
-            tableView.refresh();
-        }
+    private void filterTable(String selectedCategory, String searchText) {
+        Predicate<Book> predicate = book -> {
+            boolean categoryMatch = "All".equals(selectedCategory) || book.getCategory().equalsIgnoreCase(selectedCategory);
+            boolean titleMatch = searchText.isEmpty() || book.getTitle().toLowerCase().contains(searchText.toLowerCase());
+            return categoryMatch && titleMatch;
+        };
+        FilteredList<Book> filteredList = new FilteredList<>(FXCollections.observableArrayList(books));
+        filteredList.setPredicate(predicate);
+        tableView.setItems(filteredList);
+        tableView.refresh();
     }
+
 
 
     private static TableColumn<Book, ImageView> getBookImageViewTableColumn() {
