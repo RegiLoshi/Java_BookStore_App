@@ -1,8 +1,10 @@
 package application.bookstore.views;
 
+import application.bookstore.auxiliaries.Alerts;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.controllers.BookController;
 import application.bookstore.controllers.BookList;
+import application.bookstore.controllers.FilterController;
 import application.bookstore.models.Book;
 import application.bookstore.models.User;
 import javafx.beans.property.SimpleObjectProperty;
@@ -10,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,6 +29,7 @@ import javafx.util.Callback;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 
 public class BookView implements DatabaseConnector {
@@ -40,6 +44,8 @@ public class BookView implements DatabaseConnector {
     private User user;
     private BookList bookList;
     private ArrayList<Book> books;
+    private Button search_button;
+    private TableView<Book> tableView;
 
     public BookView(StringProperty role ,User user) {
         this.role = role;
@@ -57,12 +63,8 @@ public class BookView implements DatabaseConnector {
         search_field.setMinWidth(600);
         search_field.setMinHeight(40);
 
-        hbox = new HBox();
-        hbox.setAlignment(Pos.CENTER);
-        hbox.getChildren().addAll(search_label, search_field);
-        hbox.setSpacing(30);
 
-        TableView<Book> tableView = new TableView<>();
+        tableView = new TableView<>();
         TableView<Book> buying_tableView = new TableView<>();
         tableView.setRowFactory(tv -> {
             TableRow<Book> row = new TableRow<>();
@@ -87,6 +89,10 @@ public class BookView implements DatabaseConnector {
                             Stage editStage = new Stage();
                             editStage.setScene(editBookView.showView(editStage));
                             editStage.show();
+                            bookList = new BookList();
+                            books = bookList.getBooks();
+                            tableView.getItems().addAll(books);
+                            tableView.refresh();
                         } catch (Exception ex) {
                             throw new RuntimeException(ex);
                         }
@@ -96,6 +102,7 @@ public class BookView implements DatabaseConnector {
                     deleteButton.setOnAction(e -> {
                         BookController.deleteBook(selectedBook.getISBN());
                         tableView.getItems().remove(selectedBook);
+                        tableView.refresh();
                         actionStage.close();
                     });
 
@@ -109,7 +116,6 @@ public class BookView implements DatabaseConnector {
             });
             return row;
         });
-
 
         TableColumn<Book, Long> isbnCol = new TableColumn<>("ISBN");
         isbnCol.setCellValueFactory(
@@ -223,22 +229,6 @@ public class BookView implements DatabaseConnector {
 
 
         TableColumn<Book ,CheckBox> selectCol = new TableColumn<>("");
-
-        FileInputStream file = null;
-        String os = System.getProperty("os.name").toLowerCase();
-        try {
-            if(os.contains("win"))
-                file = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\Images\\touch.png");
-            else
-                file = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        Image img = new Image(file);
-        ImageView image = new ImageView(img);
-        image.setFitWidth(20);
-        image.setFitHeight(20);
-        selectCol.setGraphic(image);
         selectCol.setSortable(false);
         selectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Book, CheckBox>, ObservableValue<CheckBox>>() {
             @Override
@@ -262,11 +252,7 @@ public class BookView implements DatabaseConnector {
 
         TableColumn<Book ,CheckBox> buyselectCol = new TableColumn<>("");
         FileInputStream file2 = null;
-
         try {
-            if(os.contains("win"))
-                file2 = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\Images\\touch.png");
-            else
             file2 = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -333,11 +319,29 @@ public class BookView implements DatabaseConnector {
 
         bookList = new BookList();
         books = bookList.getBooks();
+        if(!(user.getRoleString().equalsIgnoreCase("librarian")) && !(books.isEmpty())){
+            BookList.notifyLowQuantity();
+        }
         tableView.getItems().addAll(books);
 
         VBox tables = new VBox();
         tables.getChildren().addAll(tableView , buying_tableView);
 
+        ComboBox<String> filterComboBox = FilterController.createFilterComboBox(bookList.getCategories());
+
+        search_button = new Button("Search");
+        search_button.setMinWidth(30);
+        search_button.setMinHeight(30);
+        search_button.setOnAction(event -> {
+            String searchText = search_field.getText();
+            String selectedCategory = filterComboBox.getValue();
+            filterTable(selectedCategory, searchText);
+        });
+        filterComboBox.setOnAction(event -> filterTable(filterComboBox.getValue(), search_field.getText()));
+        hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER);
+        hbox.getChildren().addAll(search_label, search_field , search_button , filterComboBox);
+        hbox.setSpacing(30);
 
         HBox hbox_bottom = new HBox();
 
@@ -345,18 +349,24 @@ public class BookView implements DatabaseConnector {
         generateBill.setMinWidth(50);
         generateBill.setMinHeight(50);
         generateBill.setOnAction( e->{
-            BookController.generateBill(user , selectedBooks , calculateTotalSum() );
-            for (Book selectedBook : selectedBooks) {
-                int newQuantity = selectedBook.getQuantity() - selectedBook.getChosenQuantity();
-                selectedBook.setQuantity(newQuantity);
-            }
-            selectedBooks.clear();
-            tableView.refresh();
-            buying_tableView.refresh();
+            if(selectedBooks.isEmpty()){
+                Alerts.showAlert(Alert.AlertType.ERROR , "No Books Selected!" , "Please Select Book!");
+            }else {
+                BookController.generateBillToDatabase(selectedBooks , calculateTotalSum() , user);
+                BookController.generateBill(user, selectedBooks, calculateTotalSum());
+                for (Book selectedBook : selectedBooks) {
+                    int newQuantity = selectedBook.getQuantity() - selectedBook.getChosenQuantity();
+                    selectedBook.setQuantity(newQuantity);
+                }
+                selectedBooks.clear();
+                tableView.refresh();
+                totalSumLabel.setText("");
+                buying_tableView.refresh();
 
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setHeaderText("Successfully Generated Bill");
-            alert.show();
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText("Successfully Generated Bill");
+                alert.show();
+            }
         });
         totalSumLabel = new Label("Total amount ");
         totalSumLabel.setStyle("-fx-font-size: 20px;");
@@ -385,7 +395,14 @@ public class BookView implements DatabaseConnector {
             });
             addBook.setMinWidth(50);
             addBook.setMinHeight(50);
-            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton , addBook );
+            if(role.toString().equalsIgnoreCase("admin")) {
+                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook);
+            }else{
+                Button statistic = new Button("Statistic");
+                statistic.setMinWidth(50);
+                statistic.setMinHeight(50);
+                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic);
+            }
         }else{
             hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton);
         }
@@ -400,6 +417,21 @@ public class BookView implements DatabaseConnector {
         stage.setTitle("Books");
         return new Scene(pane, 1000 , 700 );
     }
+
+    private void filterTable(String selectedCategory, String searchText) {
+        Predicate<Book> predicate = book -> {
+            boolean categoryMatch = "All".equals(selectedCategory) || book.getCategory().equalsIgnoreCase(selectedCategory);
+            boolean titleMatch = searchText.isEmpty() || book.getTitle().toLowerCase().contains(searchText.toLowerCase());
+            return categoryMatch && titleMatch;
+        };
+        FilteredList<Book> filteredList = new FilteredList<>(FXCollections.observableArrayList(books));
+        filteredList.setPredicate(predicate);
+        tableView.setItems(filteredList);
+        tableView.refresh();
+    }
+
+
+
     private static TableColumn<Book, ImageView> getBookImageViewTableColumn() {
         TableColumn<Book, ImageView> imageCol = new TableColumn<>("Image");
         imageCol.setCellValueFactory(new PropertyValueFactory<>("bookImageProperty"));

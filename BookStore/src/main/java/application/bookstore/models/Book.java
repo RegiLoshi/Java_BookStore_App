@@ -282,7 +282,7 @@ public class Book  implements DatabaseConnector {
 
   public void saveToDatabase() {
     try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
-      String sql = "INSERT INTO Book (ISBN, name, author, category, supplierId, description, bookURL, original_price, selling_price, quantity) " +
+      String sql = "INSERT INTO Book (ISBN, name, author, category, supplier, description, bookURL, original_price, selling_price, quantity) " +
               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
       try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

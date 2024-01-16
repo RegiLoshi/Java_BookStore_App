@@ -1,0 +1,7 @@
+Sold by: admin admin Role: admin
+
+Books:
+- A Game of Thrones (Chosen Quantity: 2): $40.0A Game of Thrones - $40.0
+- Harry Potter and the Philosopher's Stone (Chosen Quantity: 3): $30.0Harry Potter and the Philosopher's Stone - $30.0
+
+Total Amount: $170.0
