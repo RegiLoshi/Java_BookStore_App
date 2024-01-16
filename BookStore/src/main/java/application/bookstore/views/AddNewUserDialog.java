@@ -1,5 +1,6 @@
 package application.bookstore.views;
 
+import application.bookstore.auxiliaries.Alerts;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.models.User;
 import javafx.beans.binding.Bindings;
@@ -75,6 +76,21 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
                         passF.getText().isEmpty() || VpassF.getText().isEmpty() ||
                         (genderToggleGroup.getSelectedToggle() == null) ||
                         (roleToggleGroup.getSelectedToggle() == null)) {
+
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Empty feilds","All fields must be completed");
+                    return false;
+                }
+                else if(!(firstNameField.getText().matches("[a-zA-Z ]{1,24}")&&
+                        LastNameField.getText().matches("[a-zA-Z ]{1,24}")))
+                {
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Error in name","The name and surname can only " +
+                            "include letters and spaces and cannot be longer than 25 characters.");
+                    return false;
+                }
+                else if(!(passF.getText().matches("^(?=.*[A-Za-z])(?=.*[\\d])[A-Za-z\\d]{8,}$")))
+                {
+                    Alerts.showAlert(Alert.AlertType.ERROR,"Error in password","The password must contain " +
+                            "a minimum of eight characters, at least one letter and one number and no other characters.");
                     return false;
                 }
                 return true;
@@ -96,9 +112,8 @@ public class AddNewUserDialog extends Dialog<User> implements DatabaseConnector 
 
         user.genderProperty().bind(Bindings.when(isMaleSelected).then("male")
                 .otherwise(Bindings.when(isFemaleSelected).then("female").otherwise("other")));
+
         //Conditional Binding
-
-
         BooleanProperty isAdminSelected = admin.selectedProperty();
         BooleanProperty isManagerSelected = manager.selectedProperty();
 

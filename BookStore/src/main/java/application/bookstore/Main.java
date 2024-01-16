@@ -3,6 +3,9 @@ package application.bookstore;
 import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.views.LoginView;
 import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -16,6 +19,7 @@ public class Main extends Application implements DatabaseConnector {
 
         stage.setScene(lg.showView(stage));
         stage.show();
+
     }
     public static void main(String[] args) {
         launch();

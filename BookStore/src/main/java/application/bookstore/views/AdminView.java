@@ -23,7 +23,7 @@ public class AdminView {
 	private Button profile_button;
 	private Button other_users_buttons;
 	private Button bookstore_button;
-	private Button perfomance_button;
+	private Button statistics_button;
 	private Button log_out_button;
 	private FileInputStream image;
 	private Image img;
@@ -87,17 +87,17 @@ public class AdminView {
 			stage.setScene(bookview.showView(stage));
 		});
 
-		perfomance_button = new Button("",buttonImages[3]);
-		perfomance_button.setPrefHeight(120);
-		perfomance_button.setPrefWidth(150);
-		perfomance_button.setBackground(null);
+		statistics_button = new Button("",buttonImages[3]);
+		statistics_button.setPrefHeight(120);
+		statistics_button.setPrefWidth(150);
+		statistics_button.setBackground(null);
 
 		log_out_button = new Button("",buttonImages[4]);
 		log_out_button.setPrefHeight(120);
 		log_out_button.setPrefWidth(150);
 		log_out_button.setBackground(null);
 
-		options.getChildren().addAll(profile_button, other_users_buttons , bookstore_button , perfomance_button , log_out_button);
+		options.getChildren().addAll(profile_button, other_users_buttons , bookstore_button , statistics_button , log_out_button);
 		options.setAlignment(Pos.CENTER);
 
 		//event handlers for the buttons
@@ -105,6 +105,12 @@ public class AdminView {
 			OtherUsersView otherUsersView=new OtherUsersView(user);
 			stage.setScene(otherUsersView.showView(stage));
 		});
+
+		statistics_button.setOnAction(e-> {
+			StatisticsView statisticsView=new StatisticsView(user);
+			stage.setScene(statisticsView.showView(stage));
+				}
+		);
 
 		center = new VBox();
 

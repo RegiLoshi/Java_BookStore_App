@@ -1,7 +1,6 @@
 package application.bookstore.views;
 
 import application.bookstore.auxiliaries.DatabaseConnector;
-import application.bookstore.auxiliaries.UsersTableView;
 import application.bookstore.models.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

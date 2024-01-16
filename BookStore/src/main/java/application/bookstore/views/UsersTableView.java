@@ -1,5 +1,6 @@
-package application.bookstore.auxiliaries;
+package application.bookstore.views;
 
+import application.bookstore.auxiliaries.DatabaseConnector;
 import application.bookstore.models.User;
 import application.bookstore.views.AddNewUserDialog;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,7 +24,7 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.util.Optional;
 
-public class UsersTableView extends VBox implements DatabaseConnector{
+public class UsersTableView extends VBox implements DatabaseConnector {
 
     private TableView<User> tableView;
     private TableColumn<User, String> firstNameColumn;
