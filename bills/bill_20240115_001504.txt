@@ -1,0 +1,6 @@
+Sold by: admin admin Role: admin
+
+Books:
+- The Shining (Chosen Quantity: 5): $35.0The Shining - $35.0
+
+Total Amount: $175.0
