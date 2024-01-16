@@ -57,6 +57,8 @@ public class BookView implements DatabaseConnector {
         search_field.setMinWidth(600);
         search_field.setMinHeight(40);
 
+
+
         hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(search_label, search_field);
@@ -223,14 +225,9 @@ public class BookView implements DatabaseConnector {
 
 
         TableColumn<Book ,CheckBox> selectCol = new TableColumn<>("");
-
         FileInputStream file = null;
-        String os = System.getProperty("os.name").toLowerCase();
         try {
-            if(os.contains("win"))
-                file = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\Images\\touch.png");
-            else
-                file = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
+            file = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -262,11 +259,7 @@ public class BookView implements DatabaseConnector {
 
         TableColumn<Book ,CheckBox> buyselectCol = new TableColumn<>("");
         FileInputStream file2 = null;
-
         try {
-            if(os.contains("win"))
-                file2 = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\Images\\touch.png");
-            else
             file2 = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
