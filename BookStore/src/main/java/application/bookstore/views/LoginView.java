@@ -35,8 +35,8 @@ public class LoginView implements DatabaseConnector {
         StackPane root = new StackPane();
 
         try {
-            FileInputStream logoFile = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/bookStoreLogo2.png");
-            FileInputStream backgroundFile = new FileInputStream("/Users/regiloshi/Downloads/closeup-books-wellorganized-shelves-bookstore.jpg");
+            FileInputStream logoFile = new FileInputStream("/Users/regiloshi/Documents/Documents - Regi’s MacBook Air (2)/Projects/BookStore_Javafx/BookStore/Images/bookStoreLogo2.png");
+            FileInputStream backgroundFile = new FileInputStream("/Users/regiloshi/Documents/Documents - Regi’s MacBook Air (2)/Projects/BookStore_Javafx/BookStore/Images/3d-render-wooden-table-looking-out-blurred-background-with-bookcase.jpg");
 
             Image logoImage = new Image(logoFile);
             Image backgroundImage = new Image(backgroundFile);
