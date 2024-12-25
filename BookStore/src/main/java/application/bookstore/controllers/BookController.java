@@ -18,8 +18,13 @@ public class BookController implements DatabaseConnector {
     public static void generateBill(User user, ObservableList<Book> selectedBooks, double amount) {
         File billsFolder = new File("bills");
         if (!billsFolder.exists()) {
-            billsFolder.mkdir();
+            boolean created = billsFolder.mkdir();
+            if (!created) {
+                System.err.println("Error: Failed to create 'bills' directory.");
+                return;
+            }
         }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String timestamp = LocalDateTime.now().format(formatter);
         String fileName = "bills/bill_" + timestamp + ".txt";
@@ -65,7 +70,7 @@ public class BookController implements DatabaseConnector {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error deleting book: " + e.getMessage());
         }
     }
 
@@ -90,13 +95,13 @@ public class BookController implements DatabaseConnector {
             }
 
             for (Book book : selectedBooks) {
-                String createeSQL = "INSERT INTO SoldBookType (ISBN, amount, soldQuantity, orderId) VALUES (?, ?, ?, ?)";
-                PreparedStatement preparedStatementt = connection.prepareStatement(createeSQL);
-                preparedStatementt.setString(1, book.getISBN());
-                preparedStatementt.setDouble(2, (book.getSellingPrice() - book.getOriginalPrice()));
-                preparedStatementt.setInt(3, book.getChosenQuantity());
-                preparedStatementt.setInt(4, orderId);
-                preparedStatementt.executeUpdate();
+                String createNewSQL = "INSERT INTO SoldBookType (ISBN, amount, soldQuantity, orderId) VALUES (?, ?, ?, ?)";
+                PreparedStatement preparedNewStatement = connection.prepareStatement(createNewSQL);
+                preparedNewStatement.setString(1, book.getISBN());
+                preparedNewStatement.setDouble(2, (book.getSellingPrice() - book.getOriginalPrice()));
+                preparedNewStatement.setInt(3, book.getChosenQuantity());
+                preparedNewStatement.setInt(4, orderId);
+                preparedNewStatement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

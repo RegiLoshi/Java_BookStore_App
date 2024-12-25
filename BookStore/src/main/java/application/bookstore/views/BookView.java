@@ -31,22 +31,21 @@ import javafx.util.Callback;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 
 public class BookView implements DatabaseConnector {
     BorderPane pane;
-    private ObservableList<Book> selectedBooks = FXCollections.observableArrayList();
+    private final ObservableList<Book> selectedBooks = FXCollections.observableArrayList();
     StringProperty role;
     private Label search_label;
     private TextField search_field;
-    private HBox hbox;
     private Label totalSumLabel;
     private ChoiceBox<Integer> choiceBox;
-    private User user;
+    private final User user;
     private BookList bookList;
     private ArrayList<Book> books;
-    private Button search_button;
     private TableView<Book> tableView;
 
     public BookView(StringProperty role ,User user) {
@@ -156,7 +155,7 @@ public class BookView implements DatabaseConnector {
                 new PropertyValueFactory<>("title"));
         buyTitleCol.setMinWidth(115);
         buyTitleCol.setCellFactory(col -> {
-            TableCell<Book, String> cell = new TableCell<Book, String>() {
+            return new TableCell<Book, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -170,7 +169,6 @@ public class BookView implements DatabaseConnector {
                     }
                 }
             };
-            return cell;
         });
 
         TableColumn<Book, String> authorCol = new TableColumn<>("Author");
@@ -198,7 +196,7 @@ public class BookView implements DatabaseConnector {
         descriptionCol.setCellValueFactory(
                 new PropertyValueFactory<>("description"));
         descriptionCol.setCellFactory(col -> {
-            TableCell<Book, String> cell = new TableCell<Book, String>() {
+            return new TableCell<Book, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -212,7 +210,6 @@ public class BookView implements DatabaseConnector {
                     }
                 }
             };
-            return cell;
         });
         descriptionCol.setMinWidth(160);
 
@@ -252,15 +249,14 @@ public class BookView implements DatabaseConnector {
         });
 
 
-        TableColumn<Book ,CheckBox> buyselectCol = new TableColumn<>("");
-        FileInputStream file2 = null;
+        TableColumn<Book ,CheckBox> buySelectCol = new TableColumn<>("");
+        FileInputStream file2;
         try {
             String os = System.getProperty("os.name").toLowerCase();
             if(os.contains("win"))
             {
                 file2 = new FileInputStream("C:\\Users\\alvin\\OneDrive\\Desktop\\BookStoreJavafx\\BookStore\\Images\\touch.png");
-            }else
-            file2 = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
+            }else file2 = new FileInputStream("/Users/regiloshi/IdeaProjects/BookStore_Javafx/BookStore/Images/touch.png");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -268,9 +264,9 @@ public class BookView implements DatabaseConnector {
         ImageView image2 = new ImageView(img2);
         image2.setFitWidth(20);
         image2.setFitHeight(20);
-        buyselectCol.setGraphic(image2);
-        buyselectCol.setSortable(false);
-        buyselectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Book, CheckBox>, ObservableValue<CheckBox>>() {
+        buySelectCol.setGraphic(image2);
+        buySelectCol.setSortable(false);
+        buySelectCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Book, CheckBox>, ObservableValue<CheckBox>>() {
             @Override
             public ObservableValue<CheckBox> call(TableColumn.CellDataFeatures<Book, CheckBox> chosenBook) {
                 Book chosen_book = chosenBook.getValue();
@@ -315,14 +311,18 @@ public class BookView implements DatabaseConnector {
 
 
 
-        buying_tableView.getColumns().addAll(buyselectCol , buyQuantityCol , sellingPrice_col,totalPriceCol, buyIsbnCol , buyTitleCol , buyAuthorCol
-        , buyImageCol );
+        buying_tableView.getColumns().addAll(
+                Arrays.asList(buySelectCol, buyQuantityCol, sellingPrice_col, totalPriceCol,
+                        buyIsbnCol, buyTitleCol, buyAuthorCol, buyImageCol)
+        );
 
         buying_tableView.setItems(selectedBooks);
 
 
-        tableView.getColumns().addAll(selectCol , isbnCol , titleCol , authorCol ,
-                categoryCol , descriptionCol , imageCol  , quantityCol);
+        tableView.getColumns().addAll(
+                Arrays.asList(selectCol, isbnCol, titleCol, authorCol,
+                        categoryCol, descriptionCol, imageCol, quantityCol)
+        );
 
         bookList = new BookList();
         books = bookList.getBooks();
@@ -336,7 +336,7 @@ public class BookView implements DatabaseConnector {
 
         ComboBox<String> filterComboBox = FilterController.createFilterComboBox(bookList.getCategories());
 
-        search_button = new Button("Search");
+        Button search_button = new Button("Search");
         search_button.setMinWidth(30);
         search_button.setMinHeight(30);
         search_button.setOnAction(event -> {
@@ -352,12 +352,12 @@ public class BookView implements DatabaseConnector {
                     }
                 });
         filterComboBox.setOnAction(event -> filterTable(filterComboBox.getValue(), search_field.getText()));
-        hbox = new HBox();
+        HBox hbox = new HBox();
         hbox.setAlignment(Pos.CENTER);
-        hbox.getChildren().addAll(search_label, search_field , search_button , filterComboBox);
+        hbox.getChildren().addAll(search_label, search_field , search_button, filterComboBox);
         hbox.setSpacing(30);
 
-        HBox hbox_bottom = new HBox();
+        HBox box_bottom = new HBox();
 
         Button generateBill = new Button("Generate Bill");
         generateBill.setMinWidth(50);
@@ -408,21 +408,9 @@ public class BookView implements DatabaseConnector {
         });
 
         if(!(user.getRoleString().equalsIgnoreCase("librarian"))){
-            Button addBook = new Button("Add Book");
-            addBook.setOnAction(event -> {
-                Stage popup = new Stage();
-                AddBookView addBookView = new AddBookView();
-                try {
-                    popup.setScene(addBookView.showView(popup));
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                popup.show();
-            });
-            addBook.setMinWidth(50);
-            addBook.setMinHeight(50);
+            Button addBook = getButton();
             if(user.getRoleString().equalsIgnoreCase("admin")) {
-                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , goBackButton);
+                box_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , goBackButton);
             }else{
                 Button statistic = new Button("Statistic");
                 statistic.setMinWidth(50);
@@ -431,22 +419,39 @@ public class BookView implements DatabaseConnector {
                             Chart1 chart1 = new Chart1(user);
                             stage.setScene(chart1.showView(stage));
                         });
-                hbox_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic );
+                box_bottom.getChildren().addAll(totalSumLabel, generateBill, clearAllButton, addBook , statistic );
             }
         }else{
-            hbox_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton );
+            box_bottom.getChildren().addAll(totalSumLabel , generateBill , clearAllButton );
         }
-        hbox_bottom.setAlignment(Pos.CENTER);
-        hbox_bottom.setSpacing(30);
-        hbox_bottom.setMinWidth(150);
-        hbox_bottom.setMinHeight(150);
+        box_bottom.setAlignment(Pos.CENTER);
+        box_bottom.setSpacing(30);
+        box_bottom.setMinWidth(150);
+        box_bottom.setMinHeight(150);
 
         pane.setCenter(tables);
         pane.setFocusTraversable(true);
         pane.setTop(hbox);
-        pane.setBottom(hbox_bottom);
+        pane.setBottom(box_bottom);
         stage.setTitle("Books");
         return new Scene(pane, 1000 , 700 );
+    }
+
+    private static Button getButton() {
+        Button addBook = new Button("Add Book");
+        addBook.setOnAction(event -> {
+            Stage popup = new Stage();
+            AddBookView addBookView = new AddBookView();
+            try {
+                popup.setScene(addBookView.showView(popup));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            popup.show();
+        });
+        addBook.setMinWidth(50);
+        addBook.setMinHeight(50);
+        return addBook;
     }
 
     private void filterTable(String selectedCategory, String searchText) {

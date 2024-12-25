@@ -19,33 +19,13 @@ import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AddBookView {
     private GridPane pane;
-    private BorderPane mainpane;
-    private HBox hbox;
-    private Button addBook;
-    private Button cancelButton;
 
-    private Label isbnLabel;
-    private Label titleLabel;
-    private Label authorLabel;
-    private Label categoryLabel;
-    private Label descriptionLabel;
-    private Label originalPriceLabel;
-    private Label sellingPriceLabel;
-    private Label quantityLabel;
-
-    private Label supplierNameLabel;
-    private Label supplierEmailLabel;
     private Label supplierPhoneLabel;
-    private Label supplierAddressLabel;
 
     private TextField isbnTextField;
     private TextField titleTextField;
@@ -62,7 +42,6 @@ public class AddBookView {
     private TextField supplierAddressTextField;
     private ImageView imageView;
     private File selectedImageFile;
-    private Label image_label;
     private Book book;
     private static final String ISBN_PATTERN = "\\d{13}";
     private static final String EMAIL_PATTERN = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
@@ -70,14 +49,14 @@ public class AddBookView {
 
 
     public Scene showView(Stage stage) throws Exception {
-        mainpane = new BorderPane();
+        BorderPane mainpane = new BorderPane();
         pane = createBookEntryForm();
-        hbox = new HBox();
-        addBook = new Button("Add Book");
+        HBox hbox = new HBox();
+        Button addBook = new Button("Add Book");
         addBook.setMinHeight(50);
         addBook.setMinWidth(150);
         addBook.setOnAction(e -> {createBook(); stage.close();});
-        cancelButton = new Button("Cancel");
+        Button cancelButton = new Button("Cancel");
         cancelButton.setMinHeight(50);
         cancelButton.setMinWidth(150);
         cancelButton.setOnAction(e -> stage.close());
@@ -108,20 +87,20 @@ public class AddBookView {
         pane.setVgap(15);
         pane.setHgap(15);
 
-        isbnLabel = new Label("ISBN:");
-        titleLabel = new Label("Title:");
-        authorLabel = new Label("Author:");
-        categoryLabel = new Label("Category:");
-        descriptionLabel = new Label("Description:");
-        originalPriceLabel = new Label("Original Price:");
-        sellingPriceLabel = new Label("Selling Price:");
-        quantityLabel = new Label("Quantity:");
+        Label isbnLabel = new Label("ISBN:");
+        Label titleLabel = new Label("Title:");
+        Label authorLabel = new Label("Author:");
+        Label categoryLabel = new Label("Category:");
+        Label descriptionLabel = new Label("Description:");
+        Label originalPriceLabel = new Label("Original Price:");
+        Label sellingPriceLabel = new Label("Selling Price:");
+        Label quantityLabel = new Label("Quantity:");
 
-        supplierNameLabel = new Label("Supplier Name:");
-        supplierEmailLabel = new Label("Supplier Email:");
+        Label supplierNameLabel = new Label("Supplier Name:");
+        Label supplierEmailLabel = new Label("Supplier Email:");
         supplierPhoneLabel = new Label("Supplier Phone:");
-        supplierAddressLabel = new Label("Supplier Address:");
-        image_label = new Label("Book Image:");
+        Label supplierAddressLabel = new Label("Supplier Address:");
+        Label image_label = new Label("Book Image:");
 
         isbnLabel.setStyle("-fx-font-size: 16;");
         titleLabel.setStyle("-fx-font-size: 16;");
@@ -176,7 +155,7 @@ public class AddBookView {
         pane.addRow(9, supplierEmailLabel, supplierEmailTextField);
         pane.addRow(10, supplierPhoneLabel, supplierPhoneTextField);
         pane.addRow(11, supplierAddressLabel, supplierAddressTextField);
-        pane.addRow(12,image_label , imageView, chooseImageButton);
+        pane.addRow(12, image_label, imageView, chooseImageButton);
 
         return pane;
     }
@@ -229,7 +208,7 @@ public class AddBookView {
 
             return book;
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            System.out.println("Invalid ISBN");
             return null;
         }
     }

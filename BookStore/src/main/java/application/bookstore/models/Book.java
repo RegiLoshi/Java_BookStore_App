@@ -155,7 +155,7 @@ public class Book  implements DatabaseConnector {
         updateStatement.executeUpdate();
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      System.out.println(e.getMessage());
     }
   }
 
@@ -263,7 +263,7 @@ public class Book  implements DatabaseConnector {
       Files.copy(sourceImageFile.toPath(), new File(destinationPath).toPath(), StandardCopyOption.REPLACE_EXISTING);
       this.imageUrl = "file:" + File.separator + File.separator + destinationPath;
     } catch (IOException e) {
-      e.printStackTrace();
+      System.out.println(e.getMessage());
     }
   }
   public String getImageUrl() {
@@ -299,7 +299,7 @@ public class Book  implements DatabaseConnector {
         preparedStatement.executeUpdate();
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      System.out.println(e.getMessage());
     }
   }
   public void updateInDatabase() {
@@ -327,7 +327,7 @@ public class Book  implements DatabaseConnector {
         }
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      System.out.println(e.getMessage());
     }
   }
 }
